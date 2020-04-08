@@ -1,0 +1,43 @@
+html,body,#map{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+#graph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255,255,255,0.75);
+  padding: 2px;
+}
+
+#control {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255,255,255,0.75);
+  padding: 2px;
+  z-index: 100;
+}
+#control input {
+  width: 35px;
+}
+#control input[type="checkbox"] {
+  width: inherit;
+  margin-left: 10px;
+}
+#control input[type="range"] {
+  width: 300px;
+  vertical-align: middle;
+}
+#control #curtime {
+  width: 80px;
+}
+#control [for="sampling"] {
+  margin-left: 10px;
+}
+#control #sampling {
+  width: 100px;
+}
