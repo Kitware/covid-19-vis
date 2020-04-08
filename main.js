@@ -23,6 +23,9 @@ var countyLayer = map.createLayer('feature', {features: ['polygon']});
 var dotLayer = map.createLayer('feature', {features: ['marker']});
 var markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
 countyLayer.visible(false);
+var uiLayer = map.createLayer('ui', {zIndex: 3});
+var tooltip = uiLayer.createWidget('dom', {position: {x: 0, y: 0}});
+var tooltipElem = $(tooltip.canvas()).attr('id', 'tooltip').addClass('hidden');
 var reader = geo.createFileReader('geojsonReader', {'layer': countyLayer});
 var counties = {};
 var promises = [];
@@ -136,7 +139,11 @@ Promise.all(promises).then(() => {
         return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
       }
     });
-
+  countyLayer.features()[0]
+    .geoOn(geo.event.feature.mouseon, countyHover)
+    .geoOn(geo.event.feature.mouseoff, function (evt) {
+      tooltipElem.addClass('hidden');
+    });
   $('#scrubber').attr('max', dateList.length - 1);
   updateView();
 
@@ -373,6 +380,23 @@ function playAction(action) {
       playStop();
       break;
   }
+}
+
+function countyHover(evt) {
+  var county = counties[evt.data.fips];
+  if (county) {
+    var contents = $('<div/>');
+    contents.append($('<div class="county_name"/>').text(county.fullname));
+    contents.append($('<div class="date"/>').text(new Date(+dateList[datePos]).toJSON().substr(0, 10)));
+    contents.append($('<div class="population"/>').text('Population: ' + county.population));
+    contents.append($('<div class="confirmed"/>').text('Confirmed: ' + county.data[dateVal].confirmed));
+    contents.append($('<div class="deaths"/>').text('Deaths: ' + county.data[dateVal].deaths));
+    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * county.data[dateVal].confirmed / county.population).toFixed(0)));
+    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * county.data[dateVal].deaths / county.population).toFixed(0)));
+    tooltip.position(evt.mouse.geo);
+    tooltipElem.html(contents.html());
+  }
+  tooltipElem.toggleClass('hidden', !county);
 }
 
 /* https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75 */
