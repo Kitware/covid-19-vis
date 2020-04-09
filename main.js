@@ -1,37 +1,46 @@
 /* global geo */
 /* eslint no-unused-vars: 0 */
 
-var map = geo.map({
+let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
   zoom: 5
 });
-var osmLayer = map.createLayer('osm'); // , {source: 'osm'});
+let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
 osmLayer.attribution(
   osmLayer.attribution() +
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
   ' COVID data from <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a>.');
 
-var groups = {
+let groups = {
   'Kansas City': ['20091', '28059'],
   'New York City': ['36005', '36047', '36061', '36081', '36085']
 };
 
-var playing = false, speed = 1, lastspeed, playTimer;
+let playing = false, speed = 1, lastspeed, playTimer;
 
-var countyLayer = map.createLayer('feature', {features: ['polygon']});
-var dotLayer = map.createLayer('feature', {features: ['marker']});
-var markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
+let countyLayer = map.createLayer('feature', {features: ['polygon']});
+let dotLayer = map.createLayer('feature', {features: ['marker']});
+let markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
 countyLayer.visible(false);
-var uiLayer = map.createLayer('ui', {zIndex: 3});
-var tooltip = uiLayer.createWidget('dom', {position: {x: 0, y: 0}});
-var tooltipElem = $(tooltip.canvas()).attr('id', 'tooltip').addClass('hidden');
-var reader = geo.createFileReader('geojsonReader', {'layer': countyLayer});
-var counties = {};
-var promises = [];
-var dateSet = {};
-var dateList = [];
-var datePos, dateVal;
+let uiLayer = map.createLayer('ui', {zIndex: 3});
+let tooltip = uiLayer.createWidget('dom', {position: {x: 0, y: 0}});
+let tooltipPosition = tooltip.position;
+tooltip.position = (pos, actualValue) => {
+  if (pos === undefined && !actualValue) {
+    let pos = map.gcsToDisplay(tooltipPosition(undefined, true));
+    return {left: pos.x, top: null, right: null, bottom: map.size().height - pos.y};
+  }
+  return tooltipPosition.call(tooltip, pos, actualValue);
+};
+let tooltipElem = $(tooltip.canvas()).attr('id', 'tooltip').addClass('hidden');
+let tooltipCounty;
+let reader = geo.createFileReader('geojsonReader', {'layer': countyLayer});
+let counties = {};
+let promises = [];
+let dateSet = {};
+let dateList = [];
+let datePos, dateVal;
 
 promises.push(reader.read(
   'gz_2010_us_050_00_20m.json',
@@ -74,7 +83,7 @@ promises.push(fetch('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/m
 }).then(csv => parseCSSE(csv, 'deaths')));
 Promise.all(promises).then(() => {
   Object.keys(counties).forEach(fips => {
-    var c = counties[fips];
+    let c = counties[fips];
     if (!c.data || !c.population || !c.polygons) {
       // this includes unassigned, "Out of (state)", and other things we probably want to process
       // need to fix Puerto Rico if the data is present
@@ -142,6 +151,7 @@ Promise.all(promises).then(() => {
   countyLayer.features()[0]
     .geoOn(geo.event.feature.mouseon, countyHover)
     .geoOn(geo.event.feature.mouseoff, function (evt) {
+      tooltipCounty = null;
       tooltipElem.addClass('hidden');
     });
   $('#scrubber').attr('max', dateList.length - 1);
@@ -314,7 +324,7 @@ function setTime(elem, value) {
       newtime = datePos; // ignore it -- a search would be better
     }
   }
-  var isplaying = playing;
+  let isplaying = playing;
   if (newtime !== datePos) {
     playStop();
     datePos = newtime;
@@ -334,6 +344,7 @@ function updateView() {
   countyLayer.features()[2].modified();
   countyLayer.features()[3].modified();
   map.draw();
+  countyHover();
   $('#scrubber').val(datePos);
   $('#curtime').val(new Date(+dateList[datePos]).toJSON().substr(0, 10));
 }
@@ -383,20 +394,24 @@ function playAction(action) {
 }
 
 function countyHover(evt) {
-  var county = counties[evt.data.fips];
-  if (county) {
-    var contents = $('<div/>');
-    contents.append($('<div class="county_name"/>').text(county.fullname));
+  if (evt) {
+    tooltipCounty = counties[evt.data.fips];
+  }
+  if (tooltipCounty) {
+    let contents = $('<div/>');
+    contents.append($('<div class="tooltipCounty_name"/>').text(tooltipCounty.fullname));
     contents.append($('<div class="date"/>').text(new Date(+dateList[datePos]).toJSON().substr(0, 10)));
-    contents.append($('<div class="population"/>').text('Population: ' + county.population));
-    contents.append($('<div class="confirmed"/>').text('Confirmed: ' + county.data[dateVal].confirmed));
-    contents.append($('<div class="deaths"/>').text('Deaths: ' + county.data[dateVal].deaths));
-    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * county.data[dateVal].confirmed / county.population).toFixed(0)));
-    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * county.data[dateVal].deaths / county.population).toFixed(0)));
-    tooltip.position(evt.mouse.geo);
+    contents.append($('<div class="population"/>').text('Population: ' + tooltipCounty.population));
+    contents.append($('<div class="confirmed"/>').text('Confirmed: ' + tooltipCounty.data[dateVal].confirmed));
+    contents.append($('<div class="deaths"/>').text('Deaths: ' + tooltipCounty.data[dateVal].deaths));
+    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * tooltipCounty.data[dateVal].confirmed / tooltipCounty.population).toFixed(0)));
+    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * tooltipCounty.data[dateVal].deaths / tooltipCounty.population).toFixed(0)));
+    if (evt) {
+      tooltip.position(evt.mouse.geo);
+    }
     tooltipElem.html(contents.html());
   }
-  tooltipElem.toggleClass('hidden', !county);
+  tooltipElem.toggleClass('hidden', !tooltipCounty);
 }
 
 /* https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75 */

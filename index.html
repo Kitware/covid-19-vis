@@ -19,7 +19,7 @@
     <input id="county_confirmed" type="checkbox" checked="true" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
     <input id="county_deaths" type="checkbox" checked="true" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
     <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
-    <label for="sampling">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
+    <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
     <!--
     add legend
     add control for overage factor
