@@ -193,6 +193,16 @@ Promise.all(promises).then(() => {
 
     c3.generate({
       bindto: '#graph',
+
+      title: {
+        text: 'Confirmed Cases and Deaths over Time'
+      },
+
+      size: {
+        width: 540,
+        height: 320,
+      },
+
       data: {
         x: 'x',
         columns: c3data,
@@ -202,11 +212,16 @@ Promise.all(promises).then(() => {
         x: {
           type: 'timeseries',
           tick: {
-            format: '%Y-%m-%d',
+            format: '%m/%d',
           },
         },
       },
     });
+
+    d3.select('#graph')
+      .style('position', 'absolute')
+      .style('top', '50px')
+      .style('left', '30px');
   }());
 
   return null;
