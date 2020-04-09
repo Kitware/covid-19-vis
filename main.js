@@ -147,7 +147,6 @@ Promise.all(promises).then(() => {
   (function() {
     const chart = document.querySelector('#graph');
     console.log(chart);
-    chart.innerHTML = '<h1>Hi!</h1>';
 
     const dates = dateList.map((d) => new Date(+d).toISOString().slice(0, 10));
 
@@ -191,6 +190,23 @@ Promise.all(promises).then(() => {
       });
 
     console.log(c3data);
+
+    c3.generate({
+      bindto: '#graph',
+      data: {
+        x: 'x',
+        columns: c3data,
+      },
+
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: '%Y-%m-%d',
+          },
+        },
+      },
+    });
   }());
 
   return null;
