@@ -33,11 +33,11 @@ var datePos, dateVal;
 
 let chart = null;
 function refreshChartData() {
-  // const curtime = new Date($('#curtime').val()).getTime();
-  const curtime = new Date('2020-03-01').getTime();
-
-  const filterTime = (data) => Object.entries(data.data).filter((entry) => entry[0] > curtime);
-  const countyData = Object.values(counties).map(filterTime).flat().map((entry) => [new Date(+entry[0]).getTime(), entry[1]]);
+  const entries = (data) => Object.entries(data.data);
+  const countyData = Object.values(counties)
+    .map(entries)
+    .flat()
+    .map((entry) => [new Date(+entry[0]).getTime(), entry[1]]);
 
   let series = {};
   countyData.forEach((entry) => {
