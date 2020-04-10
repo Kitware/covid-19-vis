@@ -95,8 +95,21 @@ function loadChart(data) {
       axis: {
         x: {
           type: 'timeseries',
+          padding: {
+            left: 0,
+          },
           tick: {
             format: '%m/%d',
+            outer: false,
+          },
+        },
+
+        y: {
+          min: 0,
+          padding: {
+            bottom: 0,
+          },
+          tick: {
             outer: false,
           },
         },
