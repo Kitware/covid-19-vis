@@ -13,6 +13,10 @@ osmLayer.attribution(
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
   ' COVID data from <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a>.');
 
+map.geoOn(geo.event.pan, _.debounce((evt) => {
+  loadChart(refreshChartData(mode, countiesInArea()));
+}, 1000));
+
 let groups = {
   'Kansas City': ['20091', '28059'],
   'New York City': ['36005', '36047', '36061', '36081', '36085']
@@ -44,24 +48,33 @@ let dateList = [];
 let datePos, dateVal;
 
 let chart = null;
-function refreshChartData(mode) {
-  const entries = (data) => Object.entries(data.data);
-  const countyData = Object.values(counties)
-    .map(entries)
-    .flat()
-    .map((entry) => [new Date(+entry[0]).getTime(), entry[1]]);
+function refreshChartData(mode, countyFilter) {
+  const entries = (record) => ({
+    fips: record[0],
+    data: Object.entries(record[1].data),
+  });
+  const countyData = Object.entries(counties)
+    .map(entries);
 
   let series = {};
-  countyData.forEach((entry) => {
-    if (series[entry[0]] === undefined) {
-      series[entry[0]] = {
-        confirmed: 0,
-        deaths: 0,
-      };
-    }
+  countyData.forEach((entry, i) => {
+    const fips = entry.fips;
+    entry.data.forEach((rec) => {
+      const date = +rec[0];
+      const counts = rec[1];
 
-    series[entry[0]].confirmed += entry[1].confirmed;
-    series[entry[0]].deaths += entry[1].deaths;
+      if (series[date] === undefined) {
+        series[date] = {
+          confirmed: 0,
+          deaths: 0,
+        };
+      }
+
+      if (countyFilter[fips] !== undefined) {
+        series[date].confirmed += Math.ceil(counts.confirmed * countyFilter[fips]);
+        series[date].deaths += Math.ceil(counts.deaths * countyFilter[fips]);
+      }
+    });
   });
 
   let c3data = [
@@ -152,7 +165,7 @@ let mode = 'total';
 function changeMode(radio) {
   mode = radio.value;
 
-  loadChart(refreshChartData(mode));
+  loadChart(refreshChartData(mode, countiesInArea()));
 }
 
 promises.push(reader.read(
@@ -271,7 +284,8 @@ Promise.all(promises).then(() => {
   updateView();
 
   // Set up the chart.
-  const data = refreshChartData('total');
+  const data = refreshChartData('total', countiesInArea());
+  const filt = countiesInArea();
   loadChart(data);
 
   d3.select('#graph')
