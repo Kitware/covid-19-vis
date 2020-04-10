@@ -1,5 +1,6 @@
-/* global geo PolyBool */
+/* global geo PolyBool c3 d3 */
 /* eslint no-unused-vars: 0 */
+/* eslint comma-dangle: 0 */
 
 let map = geo.map({
   node: '#map',
@@ -11,6 +12,10 @@ osmLayer.attribution(
   osmLayer.attribution() +
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
   ' COVID data from <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a>.');
+
+map.geoOn(geo.event.pan, _.debounce((evt) => {
+  loadChart(refreshChartData(mode, countiesInArea()));
+}, 1000));
 
 let groups = {
   'Kansas City': ['20091', '28059'],
@@ -41,6 +46,127 @@ let promises = [];
 let dateSet = {};
 let dateList = [];
 let datePos, dateVal;
+
+let chart = null;
+function refreshChartData(mode, countyFilter) {
+  const entries = (record) => ({
+    fips: record[0],
+    data: Object.entries(record[1].data),
+  });
+  const countyData = Object.entries(counties)
+    .map(entries);
+
+  let series = {};
+  countyData.forEach((entry, i) => {
+    const fips = entry.fips;
+    entry.data.forEach((rec) => {
+      const date = +rec[0];
+      const counts = rec[1];
+
+      if (series[date] === undefined) {
+        series[date] = {
+          confirmed: 0,
+          deaths: 0,
+        };
+      }
+
+      if (countyFilter[fips] !== undefined) {
+        series[date].confirmed += Math.ceil(counts.confirmed * countyFilter[fips]);
+        series[date].deaths += Math.ceil(counts.deaths * countyFilter[fips]);
+      }
+    });
+  });
+
+  let c3data = [
+    ['x'],
+    ['confirmed'],
+    ['deaths'],
+  ];
+
+  const logmode = mode.slice(0, 3) === 'log';
+  const dailymode = (logmode ? mode.slice(3) : mode) === 'daily';
+
+  Object.entries(series)
+    .sort((a, b) => a[0] - b[0])
+    .forEach((entry, i, data) => {
+      const date = new Date(+entry[0]).toISOString().slice(0, 10);
+      let confirmed = entry[1].confirmed;
+      let deaths = entry[1].deaths;
+
+      if (dailymode) {
+        const previous = data[Math.max(0, i - 1)];
+        confirmed = confirmed - previous[1].confirmed;
+        deaths = deaths - previous[1].deaths;
+      }
+
+      if (logmode) {
+        confirmed = Math.max(0, Math.log10(confirmed));
+        deaths = Math.max(0, Math.log10(deaths));
+      }
+
+      c3data[0].push(date);
+      c3data[1].push(confirmed);
+      c3data[2].push(deaths);
+    });
+
+  return c3data;
+}
+
+function loadChart(data) {
+  if (chart === null) {
+    chart = c3.generate({
+      bindto: '#graph',
+
+      title: {
+        text: 'Confirmed Cases and Deaths over Time'
+      },
+
+      size: {
+        width: 540,
+        height: 320,
+      },
+
+      data: {
+        x: 'x',
+        columns: data,
+      },
+
+      axis: {
+        x: {
+          type: 'timeseries',
+          padding: {
+            left: 0,
+          },
+          tick: {
+            format: '%m/%d',
+            outer: false,
+          },
+        },
+
+        y: {
+          min: 0,
+          padding: {
+            bottom: 0,
+          },
+          tick: {
+            outer: false,
+          },
+        },
+      },
+    });
+  } else {
+    chart.load({
+      columns: data,
+    });
+  }
+}
+
+let mode = 'total';
+function changeMode(radio) {
+  mode = radio.value;
+
+  loadChart(refreshChartData(mode, countiesInArea()));
+}
 
 promises.push(reader.read(
   'gz_2010_us_050_00_20m.json',
@@ -157,8 +283,14 @@ Promise.all(promises).then(() => {
   $('#scrubber').attr('max', dateList.length - 1);
   updateView();
 
-  window.parent.counties = counties;
-  window.parent.dateSet = dateSet;
+  // Set up the chart.
+  const data = refreshChartData('total', countiesInArea());
+  const filt = countiesInArea();
+  loadChart(data);
+
+  d3.select('#graph')
+    .style('position', 'absolute');
+
   return null;
 });
 
