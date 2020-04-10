@@ -30,6 +30,7 @@ var promises = [];
 var dateSet = {};
 var dateList = [];
 var datePos, dateVal;
+let chart = null;
 
 promises.push(reader.read(
   'gz_2010_us_050_00_20m.json',
@@ -183,34 +184,44 @@ Promise.all(promises).then(() => {
     return c3data;
   }
 
-  // Create the chart.
-  const columns = refreshChartData();
-  c3.generate({
-    bindto: '#graph',
+  function loadChart(data) {
+    if (chart === null) {
+      chart = c3.generate({
+        bindto: '#graph',
 
-    title: {
-      text: 'Confirmed Cases and Deaths over Time'
-    },
-
-    size: {
-      width: 540,
-      height: 320,
-    },
-
-    data: {
-      x: 'x',
-      columns,
-    },
-
-    axis: {
-      x: {
-        type: 'timeseries',
-        tick: {
-          format: '%m/%d',
+        title: {
+          text: 'Confirmed Cases and Deaths over Time'
         },
-      },
-    },
-  });
+
+        size: {
+          width: 540,
+          height: 320,
+        },
+
+        data: {
+          x: 'x',
+          columns: data,
+        },
+
+        axis: {
+          x: {
+            type: 'timeseries',
+            tick: {
+              format: '%m/%d',
+            },
+          },
+        },
+      });
+    } else {
+      chart.load({
+        columns: data,
+      });
+    }
+  }
+
+  // Create the chart.
+  const data = refreshChartData();
+  loadChart(data);
 
   d3.select('#graph')
     .style('position', 'absolute');
