@@ -142,14 +142,7 @@ Promise.all(promises).then(() => {
   updateView();
 
   // Chart visualization
-  (function () {
-    const chart = document.querySelector('#graph');
-    console.log(chart);
-
-    const dates = dateList.map((d) => new Date(+d).toISOString().slice(0, 10));
-
-    console.log(counties);
-
+  function refreshChartData() {
     // const curtime = new Date($('#curtime').val()).getTime();
     const curtime = new Date('2020-03-01').getTime();
 
@@ -187,8 +180,19 @@ Promise.all(promises).then(() => {
         c3data[2].push(deaths);
       });
 
-    console.log(c3data);
+    return c3data;
+  }
 
+  (function () {
+    const chart = document.querySelector('#graph');
+    console.log(chart);
+
+    const dates = dateList.map((d) => new Date(+d).toISOString().slice(0, 10));
+
+    console.log(counties);
+
+    const c3data = refreshChartData();
+    console.log(c3data);
     c3.generate({
       bindto: '#graph',
 
