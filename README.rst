@@ -1,9 +1,11 @@
 COVID-19 Visualization
 ======================
 
-Each dot represents a person.  Only a random proportion of the total population is represented.  The dots are randomly placed in the county of residence.  The sampling control determines how many dots are shown (1 per _sampling_ number in the population).
+Each dot represents a person.  Only a random proportion of the total population is represented.  The dots are randomly placed in the county of residence.  The sampling control determines how many dots are shown (1 per *sampling* number in the population).
 
 The counties are shaded based on the highest per-capita values for each data field (transparent is zero, opaque is the highest per-capita value).
+
+The data on the graph is based on the counties in the current window; counties that are partially visible are weighted proprotionate to the area that is visible.
 
 Data Source
 -----------
