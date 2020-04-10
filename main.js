@@ -30,7 +30,83 @@ var promises = [];
 var dateSet = {};
 var dateList = [];
 var datePos, dateVal;
+
 let chart = null;
+function refreshChartData() {
+  // const curtime = new Date($('#curtime').val()).getTime();
+  const curtime = new Date('2020-03-01').getTime();
+
+  const filterTime = (data) => Object.entries(data.data).filter((entry) => entry[0] > curtime);
+  const countyData = Object.values(counties).map(filterTime).flat().map((entry) => [new Date(+entry[0]).getTime(), entry[1]]);
+
+  let series = {};
+  countyData.forEach((entry) => {
+    if (series[entry[0]] === undefined) {
+      series[entry[0]] = {
+        confirmed: 0,
+        deaths: 0,
+      };
+    }
+
+    series[entry[0]].confirmed += entry[1].confirmed;
+    series[entry[0]].deaths += entry[1].deaths;
+  });
+
+  let c3data = [
+    ['x'],
+    ['confirmed'],
+    ['deaths'],
+  ];
+
+  Object.entries(series)
+    .sort((a, b) => a[0] - b[0])
+    .forEach((entry) => {
+      const date = new Date(+entry[0]).toISOString().slice(0, 10);
+      const confirmed = entry[1].confirmed;
+      const deaths = entry[1].deaths;
+
+      c3data[0].push(date);
+      c3data[1].push(confirmed);
+      c3data[2].push(deaths);
+    });
+
+  return c3data;
+}
+
+function loadChart(data) {
+  if (chart === null) {
+    chart = c3.generate({
+      bindto: '#graph',
+
+      title: {
+        text: 'Confirmed Cases and Deaths over Time'
+      },
+
+      size: {
+        width: 540,
+        height: 320,
+      },
+
+      data: {
+        x: 'x',
+        columns: data,
+      },
+
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: '%m/%d',
+          },
+        },
+      },
+    });
+  } else {
+    chart.load({
+      columns: data,
+    });
+  }
+}
 
 promises.push(reader.read(
   'gz_2010_us_050_00_20m.json',
@@ -142,84 +218,7 @@ Promise.all(promises).then(() => {
   $('#scrubber').attr('max', dateList.length - 1);
   updateView();
 
-  // Chart visualization
-  function refreshChartData() {
-    // const curtime = new Date($('#curtime').val()).getTime();
-    const curtime = new Date('2020-03-01').getTime();
-
-    const filterTime = (data) => Object.entries(data.data).filter((entry) => entry[0] > curtime);
-    const countyData = Object.values(counties).map(filterTime).flat().map((entry) => [new Date(+entry[0]).getTime(), entry[1]]);
-
-    let series = {};
-    countyData.forEach((entry) => {
-      if (series[entry[0]] === undefined) {
-        series[entry[0]] = {
-          confirmed: 0,
-          deaths: 0,
-        };
-      }
-
-      series[entry[0]].confirmed += entry[1].confirmed;
-      series[entry[0]].deaths += entry[1].deaths;
-    });
-
-    let c3data = [
-      ['x'],
-      ['confirmed'],
-      ['deaths'],
-    ];
-
-    Object.entries(series)
-      .sort((a, b) => a[0] - b[0])
-      .forEach((entry) => {
-        const date = new Date(+entry[0]).toISOString().slice(0, 10);
-        const confirmed = entry[1].confirmed;
-        const deaths = entry[1].deaths;
-
-        c3data[0].push(date);
-        c3data[1].push(confirmed);
-        c3data[2].push(deaths);
-      });
-
-    return c3data;
-  }
-
-  function loadChart(data) {
-    if (chart === null) {
-      chart = c3.generate({
-        bindto: '#graph',
-
-        title: {
-          text: 'Confirmed Cases and Deaths over Time'
-        },
-
-        size: {
-          width: 540,
-          height: 320,
-        },
-
-        data: {
-          x: 'x',
-          columns: data,
-        },
-
-        axis: {
-          x: {
-            type: 'timeseries',
-            tick: {
-              format: '%m/%d',
-            },
-          },
-        },
-      });
-    } else {
-      chart.load({
-        columns: data,
-      });
-    }
-  }
-
-  // Create the chart.
+  // Set up the chart.
   const data = refreshChartData();
   loadChart(data);
 
