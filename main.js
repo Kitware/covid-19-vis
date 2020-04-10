@@ -1,4 +1,4 @@
-/* global geo */
+/* global geo PolyBool */
 /* eslint no-unused-vars: 0 */
 
 let map = geo.map({
@@ -412,6 +412,126 @@ function countyHover(evt) {
     tooltipElem.html(contents.html());
   }
   tooltipElem.toggleClass('hidden', !tooltipCounty);
+}
+
+/**
+ * Compute the area of a polygon.
+ *
+ * @param {array} points An array of of arrays with two values each.
+ * @returns The area of the polygon.
+ */
+function polygonArea(points) {
+  var total = 0, ax, ay, sx, sy;
+  for (let i = 0; i < points.length; i += 1) {
+    ax = points[i][0];
+    ay = points[(i + 1) % points.length][1];
+    sx = points[(i + 1) % points.length][0];
+    sy = points[i][1];
+    total += (ax * ay - sx * sy);
+  }
+  return Math.abs(total * 0.5);
+}
+
+/**
+ * Perform an booleamn operation on a set of polygons.
+ *
+ * @param {string} op One of 'union', 'intersect', or other value PolyBool
+ *      supports.
+ * @param {number} epsilon Precision for calculations.  In degrees, 1e-9 is
+ *      around 0.11 mm in ground distance.
+ * @param {array} polygons A list of polygons.  Each polygon is a list of
+ *      lines.  Each line is a list of coordinates.  Each coordinate is a list
+ *      of [x, y].
+ * @returns A single polygon.
+ */
+function polygonOp(op, epsilon, polygons) {
+  op = 'select' + op.charAt(0).toUpperCase() + op.slice(1);
+  PolyBool.epsilon(epsilon);
+  let seglist = polygons.map(p => PolyBool.segments({regions: p}));
+  while (seglist.length > 1) {
+    let newlist = [], half = Math.ceil(seglist.length / 2);
+    for (let i = 0; i < half; i += 1) {
+      let segments = seglist[i];
+      if (i + half < seglist.length) {
+        let nextseg = seglist[i + half];
+        try {
+          segments = PolyBool.combine(segments, nextseg);
+        } catch (err) {
+          segments = PolyBool.segments(PolyBool.polygon(segments));
+          nextseg = PolyBool.segments(PolyBool.polygon(nextseg));
+          for (let j = 20; j >= 6; j -= 1) {
+            PolyBool.epsilon(Math.pow(0.1, j));
+            try {
+              segments = PolyBool.combine(segments, nextseg);
+              break;
+            } catch (err) {}
+          }
+          PolyBool.epsilon(epsilon);
+        }
+        if (segments.combined) {
+          segments.combined = segments.combined.filter(s => Math.abs(s.start[0] - s.end[0]) > epsilon || Math.abs(s.start[1] - s.end[1]) > epsilon);
+          segments = PolyBool[op](segments);
+        } else {
+          console.warn('Failed in polygon functions.');
+        }
+        segments.segments = segments.segments.filter(s => Math.abs(s.start[0] - s.end[0]) > epsilon || Math.abs(s.start[1] - s.end[1]) > epsilon);
+      }
+      newlist.push(segments);
+    }
+    seglist = newlist;
+  }
+  return PolyBool.polygon(seglist[0]).regions;
+}
+
+function countiesInArea(poly) {
+  if (!poly) {
+    let mapsize = map.size();
+    poly = [
+      map.displayToGcs({x: 0, y: 0}, null),
+      map.displayToGcs({x: mapsize.width, y: 0}, null),
+      map.displayToGcs({x: mapsize.width, y: mapsize.height}, null),
+      map.displayToGcs({x: 0, y: mapsize.height}, null)
+    ];
+  }
+  let oppoly = [poly.map(v => [v.x, v.y])];
+  /* Use feature 2 as it doesn't have stroke */
+  let found = countyLayer.features()[2].polygonSearch(poly, {partial: true}, null);
+  let fipsCount = {};
+  found.found.forEach((p, idx) => {
+    let fips = p.fips;
+    fipsCount[fips] = (fipsCount[fips] || 0) + 1;
+  });
+  let result = {};
+  found.found.forEach((p, idx) => {
+    let fips = p.fips;
+    if (!result[fips]) {
+      let county = counties[fips];
+      if (!county) {
+        return;
+      }
+      if (!county.area) {
+        county.oppoly = [];
+        county.polygons.forEach(cp => {
+          county.oppoly.push(cp.mapouter.map(v => [v.x, v.y]));
+          cp.mapinner.forEach(ip => {
+            county.oppoly.push(ip.map(v => [v.x, v.y]));
+          });
+        });
+        /* clean up */
+        county.oppoly = PolyBool.polygon(PolyBool.segments({regions: county.oppoly, inverted: false})).regions;
+        county.area = county.oppoly.reduce((sum, r) => sum + polygonArea(r), 0);
+      }
+      let partial = found.extra[found.index[idx]].partial;
+      if (partial || county.polygons.length > fipsCount[fips]) {
+        let partialPoly = polygonOp('intersect', 1e-9, [oppoly, county.oppoly]);
+        let partialArea = partialPoly.reduce((sum, r) => sum + polygonArea(r), 0);
+        result[fips] = partialArea / county.area;
+      } else {
+        result[fips] = 1;
+      }
+    }
+  });
+  return result;
 }
 
 /* https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75 */
