@@ -1,4 +1,4 @@
-/* global geo PolyBool c3 d3 */
+/* global geo PolyBool c3 d3 _ */
 /* eslint no-unused-vars: 0 */
 /* eslint comma-dangle: 0 */
 
@@ -12,10 +12,6 @@ osmLayer.attribution(
   osmLayer.attribution() +
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
   ' COVID data from <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a>.');
-
-map.geoOn(geo.event.pan, _.debounce((evt) => {
-  loadChart(refreshChartData(mode, countiesInArea()));
-}, 1000));
 
 let groups = {
   'Kansas City': ['20091', '28059'],
@@ -290,6 +286,10 @@ Promise.all(promises).then(() => {
 
   d3.select('#graph')
     .style('position', 'absolute');
+
+  map.geoOn(geo.event.pan, _.debounce((evt) => {
+    loadChart(refreshChartData(mode, countiesInArea()));
+  }, 1000));
 
   return null;
 });
@@ -685,15 +685,3 @@ function parseCsv(strData) {
   return arrData;
 }
 // EOF
-
-// sources:
-// https://eric.clst.org/tech/usgeojson/
-// https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv
-// ?
-// https://covid19.healthdata.org/projections
-// https://covidtracking.com/data  -- daily by state
-// https://www.unacast.com/covid19/social-distancing-scoreboard
-// https://dataforgood.fb.com/tools/disease-prevention-maps/  -- no clear data
-// https://coronadatascraper.com/#home
-// https://github.com/CSSEGISandData/COVID-19  -- John Hopkins
-// https://healthweather.us/?mode=Atypical  -- temperature data (we can't legally use)
