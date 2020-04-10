@@ -97,6 +97,7 @@ function loadChart(data) {
           type: 'timeseries',
           tick: {
             format: '%m/%d',
+            outer: false,
           },
         },
       },
