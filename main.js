@@ -1,5 +1,6 @@
-/* global geo */
+/* global geo c3 d3 */
 /* eslint no-unused-vars: 0 */
+/* eslint comma-dangle: 0 */
 
 var map = geo.map({
   node: '#map',
@@ -140,11 +141,8 @@ Promise.all(promises).then(() => {
   $('#scrubber').attr('max', dateList.length - 1);
   updateView();
 
-  window.parent.counties = counties;
-  window.parent.dateSet = dateSet;
-
   // Chart visualization
-  (function() {
+  (function () {
     const chart = document.querySelector('#graph');
     console.log(chart);
 
@@ -219,9 +217,7 @@ Promise.all(promises).then(() => {
     });
 
     d3.select('#graph')
-      .style('position', 'absolute')
-      .style('top', '50px')
-      .style('left', '30px');
+      .style('position', 'absolute');
   }());
 
   return null;
