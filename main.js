@@ -1,35 +1,47 @@
-/* global geo c3 d3 */
+/* global geo PolyBool c3 d3 */
 /* eslint no-unused-vars: 0 */
 /* eslint comma-dangle: 0 */
 
-var map = geo.map({
+let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
   zoom: 5
 });
-var osmLayer = map.createLayer('osm'); // , {source: 'osm'});
+let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
 osmLayer.attribution(
   osmLayer.attribution() +
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
   ' COVID data from <a href="https://github.com/CSSEGISandData/COVID-19">JHU CSSE</a>.');
 
-var groups = {
+let groups = {
   'Kansas City': ['20091', '28059'],
   'New York City': ['36005', '36047', '36061', '36081', '36085']
 };
 
-var playing = false, speed = 1, lastspeed, playTimer;
+let playing = false, speed = 1, lastspeed, playTimer;
 
-var countyLayer = map.createLayer('feature', {features: ['polygon']});
-var dotLayer = map.createLayer('feature', {features: ['marker']});
-var markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
+let countyLayer = map.createLayer('feature', {features: ['polygon']});
+let dotLayer = map.createLayer('feature', {features: ['marker']});
+let markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
 countyLayer.visible(false);
-var reader = geo.createFileReader('geojsonReader', {'layer': countyLayer});
-var counties = {};
-var promises = [];
-var dateSet = {};
-var dateList = [];
-var datePos, dateVal;
+let uiLayer = map.createLayer('ui', {zIndex: 3});
+let tooltip = uiLayer.createWidget('dom', {position: {x: 0, y: 0}});
+let tooltipPosition = tooltip.position;
+tooltip.position = (pos, actualValue) => {
+  if (pos === undefined && !actualValue) {
+    let pos = map.gcsToDisplay(tooltipPosition(undefined, true));
+    return {left: pos.x, top: null, right: null, bottom: map.size().height - pos.y};
+  }
+  return tooltipPosition.call(tooltip, pos, actualValue);
+};
+let tooltipElem = $(tooltip.canvas()).attr('id', 'tooltip').addClass('hidden');
+let tooltipCounty;
+let reader = geo.createFileReader('geojsonReader', {'layer': countyLayer});
+let counties = {};
+let promises = [];
+let dateSet = {};
+let dateList = [];
+let datePos, dateVal;
 
 let chart = null;
 function refreshChartData(mode) {
@@ -184,7 +196,7 @@ promises.push(fetch('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/m
 }).then(csv => parseCSSE(csv, 'deaths')));
 Promise.all(promises).then(() => {
   Object.keys(counties).forEach(fips => {
-    var c = counties[fips];
+    let c = counties[fips];
     if (!c.data || !c.population || !c.polygons) {
       // this includes unassigned, "Out of (state)", and other things we probably want to process
       // need to fix Puerto Rico if the data is present
@@ -249,7 +261,12 @@ Promise.all(promises).then(() => {
         return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
       }
     });
-
+  countyLayer.features()[0]
+    .geoOn(geo.event.feature.mouseon, countyHover)
+    .geoOn(geo.event.feature.mouseoff, function (evt) {
+      tooltipCounty = null;
+      tooltipElem.addClass('hidden');
+    });
   $('#scrubber').attr('max', dateList.length - 1);
   updateView();
 
@@ -425,7 +442,7 @@ function setTime(elem, value) {
       newtime = datePos; // ignore it -- a search would be better
     }
   }
-  var isplaying = playing;
+  let isplaying = playing;
   if (newtime !== datePos) {
     playStop();
     datePos = newtime;
@@ -445,6 +462,7 @@ function updateView() {
   countyLayer.features()[2].modified();
   countyLayer.features()[3].modified();
   map.draw();
+  countyHover();
   $('#scrubber').val(datePos);
   $('#curtime').val(new Date(+dateList[datePos]).toJSON().substr(0, 10));
 }
@@ -491,6 +509,147 @@ function playAction(action) {
       playStop();
       break;
   }
+}
+
+function countyHover(evt) {
+  if (evt) {
+    tooltipCounty = counties[evt.data.fips];
+  }
+  if (tooltipCounty) {
+    let contents = $('<div/>');
+    contents.append($('<div class="tooltipCounty_name"/>').text(tooltipCounty.fullname));
+    contents.append($('<div class="date"/>').text(new Date(+dateList[datePos]).toJSON().substr(0, 10)));
+    contents.append($('<div class="population"/>').text('Population: ' + tooltipCounty.population));
+    contents.append($('<div class="confirmed"/>').text('Confirmed: ' + tooltipCounty.data[dateVal].confirmed));
+    contents.append($('<div class="deaths"/>').text('Deaths: ' + tooltipCounty.data[dateVal].deaths));
+    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * tooltipCounty.data[dateVal].confirmed / tooltipCounty.population).toFixed(0)));
+    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * tooltipCounty.data[dateVal].deaths / tooltipCounty.population).toFixed(0)));
+    if (evt) {
+      tooltip.position(evt.mouse.geo);
+    }
+    tooltipElem.html(contents.html());
+  }
+  tooltipElem.toggleClass('hidden', !tooltipCounty);
+}
+
+/**
+ * Compute the area of a polygon.
+ *
+ * @param {array} points An array of of arrays with two values each.
+ * @returns The area of the polygon.
+ */
+function polygonArea(points) {
+  var total = 0, ax, ay, sx, sy;
+  for (let i = 0; i < points.length; i += 1) {
+    ax = points[i][0];
+    ay = points[(i + 1) % points.length][1];
+    sx = points[(i + 1) % points.length][0];
+    sy = points[i][1];
+    total += (ax * ay - sx * sy);
+  }
+  return Math.abs(total * 0.5);
+}
+
+/**
+ * Perform an booleamn operation on a set of polygons.
+ *
+ * @param {string} op One of 'union', 'intersect', or other value PolyBool
+ *      supports.
+ * @param {number} epsilon Precision for calculations.  In degrees, 1e-9 is
+ *      around 0.11 mm in ground distance.
+ * @param {array} polygons A list of polygons.  Each polygon is a list of
+ *      lines.  Each line is a list of coordinates.  Each coordinate is a list
+ *      of [x, y].
+ * @returns A single polygon.
+ */
+function polygonOp(op, epsilon, polygons) {
+  op = 'select' + op.charAt(0).toUpperCase() + op.slice(1);
+  PolyBool.epsilon(epsilon);
+  let seglist = polygons.map(p => PolyBool.segments({regions: p}));
+  while (seglist.length > 1) {
+    let newlist = [], half = Math.ceil(seglist.length / 2);
+    for (let i = 0; i < half; i += 1) {
+      let segments = seglist[i];
+      if (i + half < seglist.length) {
+        let nextseg = seglist[i + half];
+        try {
+          segments = PolyBool.combine(segments, nextseg);
+        } catch (err) {
+          segments = PolyBool.segments(PolyBool.polygon(segments));
+          nextseg = PolyBool.segments(PolyBool.polygon(nextseg));
+          for (let j = 20; j >= 6; j -= 1) {
+            PolyBool.epsilon(Math.pow(0.1, j));
+            try {
+              segments = PolyBool.combine(segments, nextseg);
+              break;
+            } catch (err) {}
+          }
+          PolyBool.epsilon(epsilon);
+        }
+        if (segments.combined) {
+          segments.combined = segments.combined.filter(s => Math.abs(s.start[0] - s.end[0]) > epsilon || Math.abs(s.start[1] - s.end[1]) > epsilon);
+          segments = PolyBool[op](segments);
+        } else {
+          console.warn('Failed in polygon functions.');
+        }
+        segments.segments = segments.segments.filter(s => Math.abs(s.start[0] - s.end[0]) > epsilon || Math.abs(s.start[1] - s.end[1]) > epsilon);
+      }
+      newlist.push(segments);
+    }
+    seglist = newlist;
+  }
+  return PolyBool.polygon(seglist[0]).regions;
+}
+
+function countiesInArea(poly) {
+  if (!poly) {
+    let mapsize = map.size();
+    poly = [
+      map.displayToGcs({x: 0, y: 0}, null),
+      map.displayToGcs({x: mapsize.width, y: 0}, null),
+      map.displayToGcs({x: mapsize.width, y: mapsize.height}, null),
+      map.displayToGcs({x: 0, y: mapsize.height}, null)
+    ];
+  }
+  let oppoly = [poly.map(v => [v.x, v.y])];
+  /* Use feature 2 as it doesn't have stroke */
+  let found = countyLayer.features()[2].polygonSearch(poly, {partial: true}, null);
+  let fipsCount = {};
+  found.found.forEach((p, idx) => {
+    let fips = p.fips;
+    fipsCount[fips] = (fipsCount[fips] || 0) + 1;
+  });
+  let result = {};
+  found.found.forEach((p, idx) => {
+    let fips = p.fips;
+    if (!result[fips]) {
+      let county = counties[fips];
+      if (!county) {
+        return;
+      }
+      if (!county.area) {
+        county.oppoly = [];
+        county.polygons.forEach(cp => {
+          county.oppoly.push(cp.mapouter.map(v => [v.x, v.y]));
+          cp.mapinner.forEach(ip => {
+            county.oppoly.push(ip.map(v => [v.x, v.y]));
+          });
+        });
+        /* clean up */
+        county.oppoly = PolyBool.polygon(PolyBool.segments({regions: county.oppoly, inverted: false})).regions;
+        county.area = county.oppoly.reduce((sum, r) => sum + polygonArea(r), 0);
+      }
+      let partial = found.extra[found.index[idx]].partial;
+      if (partial || county.polygons.length > fipsCount[fips]) {
+        let partialPoly = polygonOp('intersect', 1e-9, [oppoly, county.oppoly]);
+        let partialArea = partialPoly.reduce((sum, r) => sum + polygonArea(r), 0);
+        result[fips] = partialArea / county.area;
+      } else {
+        result[fips] = 1;
+      }
+    }
+  });
+  return result;
 }
 
 /* https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75 */
