@@ -183,46 +183,37 @@ Promise.all(promises).then(() => {
     return c3data;
   }
 
-  (function () {
-    const chart = document.querySelector('#graph');
-    console.log(chart);
+  // Create the chart.
+  const columns = refreshChartData();
+  c3.generate({
+    bindto: '#graph',
 
-    const dates = dateList.map((d) => new Date(+d).toISOString().slice(0, 10));
+    title: {
+      text: 'Confirmed Cases and Deaths over Time'
+    },
 
-    console.log(counties);
+    size: {
+      width: 540,
+      height: 320,
+    },
 
-    const c3data = refreshChartData();
-    console.log(c3data);
-    c3.generate({
-      bindto: '#graph',
+    data: {
+      x: 'x',
+      columns,
+    },
 
-      title: {
-        text: 'Confirmed Cases and Deaths over Time'
-      },
-
-      size: {
-        width: 540,
-        height: 320,
-      },
-
-      data: {
-        x: 'x',
-        columns: c3data,
-      },
-
-      axis: {
-        x: {
-          type: 'timeseries',
-          tick: {
-            format: '%m/%d',
-          },
+    axis: {
+      x: {
+        type: 'timeseries',
+        tick: {
+          format: '%m/%d',
         },
       },
-    });
+    },
+  });
 
-    d3.select('#graph')
-      .style('position', 'absolute');
-  }());
+  d3.select('#graph')
+    .style('position', 'absolute');
 
   return null;
 });
