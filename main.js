@@ -32,7 +32,7 @@ var dateList = [];
 var datePos, dateVal;
 
 let chart = null;
-function refreshChartData() {
+function refreshChartData(mode) {
   const entries = (data) => Object.entries(data.data);
   const countyData = Object.values(counties)
     .map(entries)
@@ -58,12 +58,26 @@ function refreshChartData() {
     ['deaths'],
   ];
 
+  const logmode = mode.slice(0, 3) === 'log';
+  const dailymode = (logmode ? mode.slice(3) : mode) === 'daily';
+
   Object.entries(series)
     .sort((a, b) => a[0] - b[0])
-    .forEach((entry) => {
+    .forEach((entry, i, data) => {
       const date = new Date(+entry[0]).toISOString().slice(0, 10);
-      const confirmed = entry[1].confirmed;
-      const deaths = entry[1].deaths;
+      let confirmed = entry[1].confirmed;
+      let deaths = entry[1].deaths;
+
+      if (dailymode) {
+        const previous = data[Math.max(0, i - 1)];
+        confirmed = confirmed - previous[1].confirmed;
+        deaths = deaths - previous[1].deaths;
+      }
+
+      if (logmode) {
+        confirmed = Math.max(0, Math.log10(confirmed));
+        deaths = Math.max(0, Math.log10(deaths));
+      }
 
       c3data[0].push(date);
       c3data[1].push(confirmed);
@@ -120,6 +134,13 @@ function loadChart(data) {
       columns: data,
     });
   }
+}
+
+let mode = 'total';
+function changeMode(radio) {
+  mode = radio.value;
+
+  loadChart(refreshChartData(mode));
 }
 
 promises.push(reader.read(
@@ -233,7 +254,7 @@ Promise.all(promises).then(() => {
   updateView();
 
   // Set up the chart.
-  const data = refreshChartData();
+  const data = refreshChartData('total');
   loadChart(data);
 
   d3.select('#graph')

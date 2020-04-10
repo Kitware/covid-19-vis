@@ -24,6 +24,25 @@
     <input id="county_deaths" type="checkbox" checked="true" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
     <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
     <label for="sampling">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
+
+    <div>
+      <input type="radio" name="mode" id="mode1" value="total"
+        onclick="changeMode(this)" checked>
+      <label for="mode1">Total cases</label>
+
+      <input type="radio" name="mode" id="mode2"
+        value="daily" onclick="changeMode(this)">
+      <label for="mode2">Daily cases</label>
+
+      <input type="radio" name="mode" id="mode3"
+        value="logtotal" onclick="changeMode(this)">
+      <label for="mode3">Total cases (logarithm)</label>
+
+      <input type="radio" name="mode" id="mode4"
+        value="logdaily" onclick="changeMode(this)">
+      <label for="mode4">Daily cases (logarithm)</label>
+    </div>
+
     <!--
     add legend
     add control for overage factor
