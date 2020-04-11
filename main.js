@@ -126,6 +126,10 @@ function loadChart(data) {
       data: {
         x: 'x',
         columns: data,
+        colors: {
+          confirmed: '#ff8000',
+          deaths: '#000000'
+        }
       },
 
       axis: {
