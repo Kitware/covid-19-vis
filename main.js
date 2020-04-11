@@ -46,7 +46,6 @@ let useSamples = false;
 
 let chart = null;
 function refreshChartData(mode, countyFilter) {
-  console.log(countyFilter); //DWM::
   const entries = (record) => ({
     fips: record[0],
     data: Object.entries(record[1].data),
@@ -212,7 +211,6 @@ Promise.all(promises).then(() => {
       // this includes unassigned, "Out of (state)", and other things we probably want to process
       // need to fix Puerto Rico if the data is present
       delete counties[fips];
-      // console.log(fips, c);
     }
   });
   counties.NYC = {
@@ -387,7 +385,7 @@ function updateMarkerStyle() {
   let dc = {r: 0, g: 0, b: 0}, cc = {r: 1, g: 0.5, b: 0}, oc = {r: 0, g: 0, b: 1};
   let dop = 1, cop = 0.75, oop = 0.25;
   if (!useSamples) {
-    dop = 0.5;
+    dop = 0.25;
     cop = 0.25;
     oop = 0.0001;
   }
