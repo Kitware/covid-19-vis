@@ -24,7 +24,7 @@ html,body,#map{
 #control input {
   width: 35px;
 }
-#control input[type="checkbox"] {
+#control input[type="checkbox"], #control input[type="radio"] {
   width: inherit;
   margin-left: 10px;
 }
