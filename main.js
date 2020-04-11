@@ -42,9 +42,11 @@ let promises = [];
 let dateSet = {};
 let dateList = [];
 let datePos, dateVal;
+let useSamples = false;
 
 let chart = null;
 function refreshChartData(mode, countyFilter) {
+  console.log(countyFilter); //DWM::
   const entries = (record) => ({
     fips: record[0],
     data: Object.entries(record[1].data),
@@ -336,7 +338,8 @@ function parseCSSE(csv, datakey) {
 }
 
 function makeDots() {
-  let proportion = +$('#sampling').val(), offset = 0, randomize = true;
+  useSamples = $('#samples')[0].checked;
+  let proportion = useSamples ? +$('#sampling').val() : 1;
 
   let points = [];
   Object.values(counties).forEach((county, idx) => {
@@ -348,10 +351,11 @@ function makeDots() {
       range.max.y = range.max.y === undefined || county.polygons[i].maprange.max.y > range.max.y ? county.polygons[i].maprange.max.y : range.max.y;
     }
     county.range = range;
-    for (let i = randomize ? 0 : offset; i < county.population; i += proportion) {
+    let maxIds = useSamples ? county.population : Object.values(county.data).reduce((val, r) => Math.max(val, r.deaths, r.confirmed), 0);
+    for (let i = 0; i < maxIds; i += proportion) {
       let pt;
       let id = i;
-      if (randomize) {
+      if (proportion !== 1) {
         id += Math.floor(Math.random() * proportion);
         if (id >= county.population) {
           continue;
@@ -381,6 +385,12 @@ function makeDots() {
 
 function updateMarkerStyle() {
   let dc = {r: 0, g: 0, b: 0}, cc = {r: 1, g: 0.5, b: 0}, oc = {r: 0, g: 0, b: 1};
+  let dop = 1, cop = 0.75, oop = 0.25;
+  if (!useSamples) {
+    dop = 0.5;
+    cop = 0.25;
+    oop = 0.0001;
+  }
   let data = markers.data(), datalen = data.length, d, c, i, i3;
   let mapper = markers.actors()[0].mapper();
   /*
@@ -408,7 +418,7 @@ function updateMarkerStyle() {
       fillColor[i3] = dc.r;
       fillColor[i3 + 1] = dc.g;
       fillColor[i3 + 2] = dc.b;
-      fillOpacity[i] = 1;
+      fillOpacity[i] = dop;
     } else if (d.id < c.confirmed) {
       radius[i] = 8;
       symbol[i] = geo.markerFeature.symbols.jack12 * 64;
@@ -416,7 +426,7 @@ function updateMarkerStyle() {
       fillColor[i3] = cc.r;
       fillColor[i3 + 1] = cc.g;
       fillColor[i3 + 2] = cc.b;
-      fillOpacity[i] = 0.75;
+      fillOpacity[i] = cop;
     } else {
       radius[i] = 6;
       symbol[i] = geo.markerFeature.symbols.circle * 64;
@@ -424,7 +434,7 @@ function updateMarkerStyle() {
       fillColor[i3] = oc.r;
       fillColor[i3 + 1] = oc.g;
       fillColor[i3 + 2] = oc.b;
-      fillOpacity[i] = 0.25;
+      fillOpacity[i] = oop;
     }
   }
   /*
@@ -649,8 +659,6 @@ function countiesInArea(poly) {
             county.oppoly.push(ip.map(v => [v.x, v.y]));
           });
         });
-        /* clean up */
-        county.oppoly = PolyBool.polygon(PolyBool.segments({regions: county.oppoly, inverted: false})).regions;
         county.area = county.oppoly.reduce((sum, r) => sum + polygonArea(r), 0);
       }
       let partial = found.extra[found.index[idx]].partial;
