@@ -187,7 +187,7 @@ promises.push(reader.read(
       // mapouter and mapinner are in web mercator coordinates, maprange is boundingbox
       // range is bb in lat/lon
     });
-    features[0].style({fill: false, strokeWidth: 1, strokeColor: 'blue', strokeOpacity: 0.1});
+    features[0].style({fill: false, strokeWidth: 1, strokeColor: 'black', strokeOpacity: 0.1});
     countyLayer.visible(true).draw();
   }
 ));
