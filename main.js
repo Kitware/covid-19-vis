@@ -193,6 +193,20 @@ function loadChart(data) {
         }
       }
     });
+    chart.internal.main.on('click', function () {
+      let date = chart.internal.x.invert(d3.mouse(this)[0]);
+      let pos = 0, bestdist = Math.abs(dateList[0] - date);
+      dateList.forEach((val, idx) => {
+        let dist = Math.abs(val - date);
+        if (dist < bestdist) {
+          pos = idx;
+          bestdist = dist;
+        }
+      });
+      if (pos !== datePos) {
+        setTime(undefined, pos);
+      }
+    });
   } else {
     $('.c3-title').text(chartTitle);
     chart.load({
