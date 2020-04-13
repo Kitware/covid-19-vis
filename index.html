@@ -5,7 +5,7 @@
   <meta name="viewport" content="user-scalable=no">
   <link rel="icon" href="data:,">
   <title>
-    COVID-19 Visualization
+    COVID-19 US Visualizer
   </title>
   <script type="text/javascript" src="polybool.min.js"></script>
   <script type="text/javascript" src="geo.min.js"></script>
@@ -20,7 +20,8 @@
   <div id="map"></div>
   <div id="control">
     <div>
-      <span class="title">COVID-19 Visualizer</span> <span class="note">- Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
+      <button class="help" onclick="$('#help').toggleClass('hidden')">Info</button>
+      <span class="title">COVID-19 US Visualizer</span> <span class="note">- Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
     </div>
     <div>
       <button onclick="playAction('play')">Play</button>
@@ -29,9 +30,9 @@
       FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
       <input id="curtime" onchange="setTime()"/>
       <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
+      <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
       <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
       <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
-      <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
       <!--
       <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
       <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
@@ -72,6 +73,22 @@
     </div>
   </div>
   <div id="graph"></div>
+  <div id="help" class="hidden">
+    <div id="helpcontainer">
+      <div><button onclick="$('#help').toggleClass('hidden')">Close</burron></div>
+      <h1>COVID-19 US Visualizer</h1>
+      <p>This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.</p>
+      <p>The data is per county in the US.
+        When showing markers, markers are distributed randomly through each county based on the number present.  These markers <b>do not represent actual people or locations</b>.</p>
+      <h2>Modes</h2>
+      <p><b>Markers</b>: One marker is drawn per confirmed case (orange) or death (black).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
+      <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid orange.</p>
+      <p><b>Deaths</b>: Each county is colored based on the number of deaths per capita, with the county with the most extreme value being solid black.</p>
+      <h2>Source Code</h2>
+      <p>The source code is on <a href="https://github.com/Kitware/covid-19-vis">GitHub</a>.</p>
+      <p>The map markers and choropleth use <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>.</p>
+    </div>
+  </div>
   <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
