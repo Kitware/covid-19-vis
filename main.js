@@ -291,7 +291,8 @@ Promise.all(promises).then(() => {
         }
         return (counties[d.fips].data[dateVal].confirmed || 0) / counties[d.fips].population / rates.confirmed;
       }
-    });
+    })
+    .visible($('#county_confirmed')[0].checked);
   countyLayer.createFeature('polygon')
     .data(countyLayer.features()[0].data())
     .position(countyLayer.features()[0].position())
@@ -307,7 +308,8 @@ Promise.all(promises).then(() => {
         }
         return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
       }
-    });
+    })
+    .visible($('#county_deaths')[0].checked);
   countyLayer.features()[0]
     .geoOn(geo.event.feature.mouseon, countyHover)
     .geoOn(geo.event.feature.mouseoff, function (evt) {
@@ -448,7 +450,7 @@ function updateMarkerStyle() {
     d = data[i];
     c = d.c.data[dateVal];
     if (d.id < c.deaths) {
-      radius[i] = 9;
+      radius[i] = 7; // 9;
       symbol[i] = geo.markerFeature.symbols.star12 * 64;
       symbolValue[i] = 0.75;
       fillColor[i3] = dc.r;
@@ -456,7 +458,7 @@ function updateMarkerStyle() {
       fillColor[i3 + 2] = dc.b;
       fillOpacity[i] = dop;
     } else if (d.id < c.confirmed) {
-      radius[i] = 8;
+      radius[i] = 6; // 8;
       symbol[i] = geo.markerFeature.symbols.jack12 * 64;
       symbolValue[i] = 0.25;
       fillColor[i3] = cc.r;
@@ -464,7 +466,7 @@ function updateMarkerStyle() {
       fillColor[i3 + 2] = cc.b;
       fillOpacity[i] = cop;
     } else {
-      radius[i] = 6;
+      radius[i] = 5; // 6;
       symbol[i] = geo.markerFeature.symbols.circle * 64;
       symbolValue[i] = 1;
       fillColor[i3] = oc.r;
@@ -491,11 +493,14 @@ function updateMarkerStyle() {
 }
 
 function setDatePos(pos) {
-  datePos = (pos + dateList.length) % dateList.length;
-  dateVal = dateList[datePos];
-  if (chart) {
-    chart.xgrids()[0].value = +dateVal;
-    chart.show();
+  pos = (pos + dateList.length) % dateList.length;
+  if (pos !== datePos) {
+    datePos = pos;
+    dateVal = dateList[datePos];
+    if (chart) {
+      chart.xgrids()[0].value = +dateVal;
+      chart.show();
+    }
   }
 }
 
