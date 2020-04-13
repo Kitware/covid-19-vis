@@ -38,25 +38,37 @@
     </div>
     <div>
       <input type="radio" name="mode" id="mode1" value="total"
+        charttitle="Total Confirmed Cases and Deaths"
         onclick="changeMode(this)" checked>
       <label for="mode1">Total cases</label>
 
-      <input type="radio" name="mode" id="mode2"
-        value="daily" onclick="changeMode(this)">
-      <label for="mode2">Daily cases</label>
-
       <input type="radio" name="mode" id="mode3"
+        charttitle="Logarithmic Total Confirmed Cases and Deaths"
         value="logtotal" onclick="changeMode(this)">
       <label for="mode3">Total cases (logarithm)</label>
 
+      <input type="radio" name="mode" id="mode5"
+        charttitle="Total Confirmed Cases and Deaths per Million People"
+        value="percapitatotal" onclick="changeMode(this)">
+      <label for="mode5">Total per capita</label>
+
+      <input type="radio" name="mode" id="mode2"
+        charttitle="Daily Confirmed Cases and Deaths"
+        value="daily" onclick="changeMode(this)">
+      <label for="mode2">Daily cases</label>
+
+      <!--
       <input type="radio" name="mode" id="mode4"
+        charttitle="Logarithmic Daily Confirmed Cases and Deaths"
         value="logdaily" onclick="changeMode(this)">
       <label for="mode4">Daily cases (logarithm)</label>
+      -->
+      
+      <input type="radio" name="mode" id="mode6"
+        charttitle="Daily Confirmed Cases and Deaths per Million People"
+        value="percapitadaily" onclick="changeMode(this)">
+      <label for="mode6">Daily per capita</label>
     </div>
-    <!--
-    add legend
-    add control for overage factor
-    -->
   </div>
   <div id="graph"></div>
   <script type="text/javascript" src="main.js"></script>

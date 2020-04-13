@@ -39,6 +39,9 @@ let map = geo.map({
   zoom: 5,
   max: 14
 });
+/* Got to the continental United States and zoom out a bit */
+map.bounds({left: -124.85, top: 49.39, right: -66.88, bottom: 24.39});
+map.zoom(map.zoom() - 0.25);
 let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
 osmLayer.attribution(
   osmLayer.attribution() +
@@ -78,32 +81,21 @@ let useSamples = false;
 
 let chart = null;
 function refreshChartData(mode, countyFilter) {
-  const entries = (record) => ({
-    fips: record[0],
-    data: Object.entries(record[1].data),
-  });
-  const countyData = Object.entries(counties)
-    .map(entries);
-
-  let series = {};
-  countyData.forEach((entry, i) => {
-    const fips = entry.fips;
-    entry.data.forEach((rec) => {
-      const date = +rec[0];
-      const counts = rec[1];
-
+  let series = {}, population = 0;
+  Object.entries(countyFilter).forEach(([fips, weight]) => {
+    let county = counties[fips];
+    Object.entries(county.data).forEach(([date, counts]) => {
+      date = +date;
       if (series[date] === undefined) {
         series[date] = {
           confirmed: 0,
           deaths: 0,
         };
       }
-
-      if (countyFilter[fips] !== undefined) {
-        series[date].confirmed += Math.ceil(counts.confirmed * countyFilter[fips]);
-        series[date].deaths += Math.ceil(counts.deaths * countyFilter[fips]);
-      }
+      series[date].confirmed += counts.confirmed * weight;
+      series[date].deaths += counts.deaths * weight;
     });
+    population += county.population * weight;
   });
 
   let c3data = [
@@ -113,19 +105,27 @@ function refreshChartData(mode, countyFilter) {
   ];
 
   const logmode = mode.slice(0, 3) === 'log';
-  const dailymode = (logmode ? mode.slice(3) : mode) === 'daily';
+  const percapitamode = mode.slice(0, 9) === 'percapita';
+  const dailymode = mode.slice(mode.length - 5) === 'daily';
 
   Object.entries(series)
     .sort((a, b) => a[0] - b[0])
     .forEach((entry, i, data) => {
       const date = new Date(+entry[0]).toISOString().slice(0, 10);
-      let confirmed = entry[1].confirmed;
-      let deaths = entry[1].deaths;
-
+      let confirmed = +entry[1].confirmed;
+      let deaths = +entry[1].deaths;
       if (dailymode) {
         const previous = data[Math.max(0, i - 1)];
         confirmed = confirmed - previous[1].confirmed;
         deaths = deaths - previous[1].deaths;
+      }
+
+      if (percapitamode) { // per million
+        confirmed *= 1e6 / population;
+        deaths *= 1e6 / population;
+      } else {
+        confirmed = Math.ceil(confirmed);
+        deaths = Math.ceil(deaths);
       }
 
       if (logmode) {
@@ -137,17 +137,17 @@ function refreshChartData(mode, countyFilter) {
       c3data[1].push(confirmed);
       c3data[2].push(deaths);
     });
-
   return c3data;
 }
 
 function loadChart(data) {
+  let chartTitle = $('input[type="radio"][value="' + mode + '"]').attr('charttitle');
   if (chart === null) {
     chart = c3.generate({
       bindto: '#graph',
 
       title: {
-        text: 'Confirmed Cases and Deaths over Time'
+        text: chartTitle || 'Total Confirmed Cases and Deaths'
       },
 
       size: {
@@ -193,6 +193,7 @@ function loadChart(data) {
       }
     });
   } else {
+    $('.c3-title').text(chartTitle);
     chart.load({
       columns: data,
     });
@@ -203,7 +204,7 @@ let mode = 'total';
 function changeMode(radio) {
   mode = radio.value;
 
-  loadChart(refreshChartData(mode, countiesInArea()));
+  loadChart(refreshChartData(mode, countiesInArea()), mode);
 }
 
 promises.push(reader.read(
@@ -323,13 +324,13 @@ Promise.all(promises).then(() => {
   // Set up the chart.
   const data = refreshChartData('total', countiesInArea());
   const filt = countiesInArea();
-  loadChart(data);
+  loadChart(data, 'total');
 
   d3.select('#graph')
     .style('position', 'absolute');
 
   map.geoOn(geo.event.pan, _.debounce((evt) => {
-    loadChart(refreshChartData(mode, countiesInArea()));
+    loadChart(refreshChartData(mode, countiesInArea()), mode);
   }, 1000));
 
   return null;
@@ -432,13 +433,6 @@ function updateMarkerStyle() {
   }
   let data = markers.data(), datalen = data.length, d, c, i, i3;
   let mapper = markers.actors()[0].mapper();
-  /*
-  let radius = new Array(datalen),
-      symbol = new Array(datalen),
-      symbolValue = new Array(datalen),
-      fillColor = new Array(datalen),
-      fillOpacity = new Array(datalen);
-   */
   let radius = mapper.getSourceBuffer('radius'),
       symbol = mapper.getSourceBuffer('symbol'),
       symbolValue = mapper.getSourceBuffer('symbolValue'),
@@ -476,15 +470,6 @@ function updateMarkerStyle() {
       fillOpacity[i] = oop;
     }
   }
-  /*
-  markers.updateStyleFromArray({
-    radius: radius,
-    symbolComputed: symbol,
-    symbolValueComputed: symbolValue,
-    fillColor: fillColor,
-    fillOpacity: fillOpacity
-  });
-  */
   mapper.updateSourceBuffer('radius');
   mapper.updateSourceBuffer('symbol');
   mapper.updateSourceBuffer('symbolValue');
