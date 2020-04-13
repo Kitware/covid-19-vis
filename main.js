@@ -142,6 +142,7 @@ function refreshChartData(mode, countyFilter) {
 
 function loadChart(data) {
   let chartTitle = $('input[type="radio"][value="' + mode + '"]').attr('charttitle');
+  chartTitle += ' across Visible Map';
   if (chart === null) {
     chart = c3.generate({
       bindto: '#graph',
