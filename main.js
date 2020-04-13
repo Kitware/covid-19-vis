@@ -2,6 +2,38 @@
 /* eslint no-unused-vars: 0 */
 /* eslint comma-dangle: 0 */
 
+/* This adjusts the requested screen size for mobile devices.  It responds to
+ * oreintation changes on Chrome on Android, but not on Firefox on Android. */
+function adjustMetaViewport() {
+  let minArea = 360 * 540 * 3, minWidth = 550, minHeight = 520;
+  let viewport = document.querySelector('meta[name=viewport]');
+  if (viewport) {
+    document.head.removeChild(viewport);
+  }
+  let content = 'user-scalable=no';
+  viewport = document.createElement('meta');
+  viewport.setAttribute('name', 'viewport');
+  viewport.setAttribute('content', content);
+  document.head.appendChild(viewport);
+  console.log(screen);
+  if (screen && screen.width * screen.height && screen.width * screen.height < minArea) {
+    let scale = Math.max(
+      Math.sqrt(minArea / (screen.width * screen.height)),
+      minWidth / screen.width,
+      minHeight / screen.height
+    );
+    content += ', width=' + Math.ceil(screen.width * scale);
+    document.head.removeChild(viewport);
+    viewport = document.createElement('meta');
+    viewport.setAttribute('name', 'viewport');
+    viewport.setAttribute('content', content);
+    document.head.appendChild(viewport);
+  }
+}
+
+window.onorientationchange = adjustMetaViewport;
+adjustMetaViewport();
+
 let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
