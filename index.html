@@ -18,19 +18,24 @@
 <body>
   <div id="map"></div>
   <div id="control">
-    <button onclick="playAction('play')">Play</button>
-    <button onclick="playAction('step')">Step</button>
-    <button onclick="playAction('stop')">Stop</button>
-    FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
-    <input id="curtime" onchange="setTime()"/>
-    <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
-    <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
-    <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
-    <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
-    <!--
-    <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
-    <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
-    -->
+    <div>
+      <span class="title">COVID-19 Visualizer</span> <span class="note">- Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
+    </div>
+    <div>
+      <button onclick="playAction('play')">Play</button>
+      <button onclick="playAction('step')">Step</button>
+      <button onclick="playAction('stop')">Stop</button>
+      FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
+      <input id="curtime" onchange="setTime()"/>
+      <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
+      <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
+      <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
+      <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
+      <!--
+      <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
+      <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
+      -->
+    </div>
     <div>
       <input type="radio" name="mode" id="mode1" value="total"
         onclick="changeMode(this)" checked>
