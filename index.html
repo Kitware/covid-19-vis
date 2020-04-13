@@ -21,7 +21,7 @@
     <button onclick="playAction('play')">Play</button>
     <button onclick="playAction('step')">Step</button>
     <button onclick="playAction('stop')">Stop</button>
-    Speed <input id="speed" value="1" onchange="if(playing)playAction('play')"/>
+    FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
     <input id="curtime" onchange="setTime()"/>
     <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
     <input id="county_confirmed" type="checkbox" checked="true" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>

@@ -539,7 +539,7 @@ function playStart() {
   playing = true;
   datePos = (datePos + 1) % dateList.length;
   dateVal = dateList[datePos];
-  playTimer = window.setTimeout(playStart, 1000 / speed);
+  playTimer = window.setTimeout(playStart, datePos !== dateList.length - 1 ? 1000 / speed : (10000 / speed));
   updateView();
 }
 
