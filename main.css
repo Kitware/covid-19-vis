@@ -62,7 +62,19 @@ html,body,#map{
   color: black;
   pointer-events: none;
 }
-#tooltip.hidden {
+#tooltip.hidden, #help.hidden {
   display: none;
 }
+#help {
+  position: absolute;
+  z-index: 3000;
+  max-height: 85vh;
+  top: 5vh;
+  background: rgba(255, 255, 255, 0.75);
+  border: solid black 1px;
+  margin: 10px;
+  padding: 10px;
+  overflow-y: auto;
+}
+
 
