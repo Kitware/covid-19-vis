@@ -15,7 +15,6 @@ function adjustMetaViewport() {
   viewport.setAttribute('name', 'viewport');
   viewport.setAttribute('content', content);
   document.head.appendChild(viewport);
-  console.log(screen);
   if (screen && screen.width * screen.height && screen.width * screen.height < minArea) {
     let scale = Math.max(
       Math.sqrt(minArea / (screen.width * screen.height)),
@@ -186,6 +185,11 @@ function loadChart(data) {
           },
         },
       },
+      grid: {
+        x: {
+          lines: [{value: +dateVal}]
+        }
+      }
     });
   } else {
     chart.load({
@@ -260,9 +264,7 @@ Promise.all(promises).then(() => {
   groups['New York City'].forEach(fips => delete counties[fips]);
   dateList = Object.keys(dateSet).sort();
   Object.keys(dateSet).forEach(k => { dateSet[k] = dateList.indexOf(k); });
-  datePos = dateList.length - 1;
-  dateVal = dateList[datePos];
-
+  setDatePos(dateList.length - 1);
   makeDots();
 
   let rates = {};
@@ -488,6 +490,15 @@ function updateMarkerStyle() {
   markers.renderer()._render();
 }
 
+function setDatePos(pos) {
+  datePos = (pos + dateList.length) % dateList.length;
+  dateVal = dateList[datePos];
+  if (chart) {
+    chart.xgrids()[0].value = +dateVal;
+    chart.show();
+  }
+}
+
 function setTime(elem, value) {
   let newtime = elem === undefined && value !== undefined ? parseInt(value, 10) : 0;
   if (elem !== undefined && value) {
@@ -503,8 +514,7 @@ function setTime(elem, value) {
   let isplaying = playing;
   if (newtime !== datePos) {
     playStop();
-    datePos = newtime;
-    dateVal = dateList[datePos];
+    setDatePos(newtime);
     if (isplaying) {
       datePos += dateList.length - 1;
       playStart();
@@ -537,8 +547,7 @@ function playStart() {
     window.clearTimeout(playTimer);
   }
   playing = true;
-  datePos = (datePos + 1) % dateList.length;
-  dateVal = dateList[datePos];
+  setDatePos(datePos + 1);
   playTimer = window.setTimeout(playStart, datePos !== dateList.length - 1 ? 1000 / speed : (10000 / speed));
   updateView();
 }
@@ -559,8 +568,7 @@ function playAction(action) {
       break;
     case 'step':
       playStop();
-      datePos = (datePos + 1) % dateList.length;
-      dateVal = dateList[datePos];
+      setDatePos(datePos + 1);
       updateView();
       break;
     case 'stop':
