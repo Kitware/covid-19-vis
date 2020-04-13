@@ -15,18 +15,28 @@
   <script type="text/javascript" src="https://unpkg.com/underscore@1.10.2/underscore-min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/c3@0.7.15/c3.min.css" type="text/css"/>
   <link rel="stylesheet" href="main.css" type="text/css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Blinker:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="map"></div>
-  <div id="control">
-    <div>
-      <button class="help" onclick="$('#help').toggleClass('hidden')">Info</button>
-      <span class="title">COVID-19 US Visualizer</span> <span class="note">- Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
+  <div class="top-controls">
+    <div id="disclaimer" class="control">
+      <div class="panel">
+        <button class="help" onclick="$('#help').toggleClass('hidden')">Info</button>
+        <h1 class="title">COVID-19 Visualizer</h1>
+        <span class="note">Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
+      </div>
     </div>
-    <div>
-      <button onclick="playAction('play')">Play</button>
-      <button onclick="playAction('step')">Step</button>
-      <button onclick="playAction('stop')">Stop</button>
+    <div id="timeline" class="control">
+      <button onclick="playAction('play')">
+        <span class="iconify" data-icon="mdi:play"></span>
+      </button>
+      <button onclick="playAction('step')">
+        <span class="iconify" data-icon="mdi:step-forward"></span>
+      </button>
+      <button onclick="playAction('stop')">
+        <span class="iconify" data-icon="mdi:stop"></span>
+      </button>
       FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
       <input id="curtime" onchange="setTime()"/>
       <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
@@ -38,40 +48,57 @@
       <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
       -->
     </div>
-    <div>
-      <input type="radio" name="mode" id="mode1" value="total"
-        charttitle="Total Confirmed Cases and Deaths"
-        onclick="changeMode(this)" checked>
-      <label for="mode1">Total cases</label>
+  </div>
+  <div id="graph" class="control">
+    <div class="panel no-pad">
+      <ul class="radio-controls">
+        <li>
+          <input type="radio" name="mode" id="mode1" value="total"
+          charttitle="Total Confirmed Cases and Deaths"
+          onclick="changeMode(this)" checked>
+          <label for="mode1">Total cases</label>
+        </li>
 
-      <input type="radio" name="mode" id="mode3"
-        charttitle="Logarithmic Total Confirmed Cases and Deaths"
-        value="logtotal" onclick="changeMode(this)">
-      <label for="mode3">Total cases (logarithm)</label>
+        <li>
+          <input type="radio" name="mode" id="mode3"
+          charttitle="Logarithmic Total Confirmed Cases and Deaths"
+          value="logtotal" onclick="changeMode(this)">
+          <label for="mode3">Total cases (logarithm)</label>
+        </li>
 
-      <input type="radio" name="mode" id="mode5"
-        charttitle="Total Confirmed Cases and Deaths per Million People"
-        value="percapitatotal" onclick="changeMode(this)">
-      <label for="mode5">Total per capita</label>
+        <li>
+          <input type="radio" name="mode" id="mode5"
+          charttitle="Total Confirmed Cases and Deaths per Million People"
+          value="percapitatotal" onclick="changeMode(this)">
+          <label for="mode5">Total per capita</label>
+        </li>
 
-      <input type="radio" name="mode" id="mode2"
-        charttitle="Daily Confirmed Cases and Deaths"
-        value="daily" onclick="changeMode(this)">
-      <label for="mode2">Daily cases</label>
+        <li>
+          <input type="radio" name="mode" id="mode2"
+          charttitle="Daily Confirmed Cases and Deaths"
+          value="daily" onclick="changeMode(this)">
+          <label for="mode2">Daily cases</label>
+        </li>
 
-      <!--
-      <input type="radio" name="mode" id="mode4"
-        charttitle="Logarithmic Daily Confirmed Cases and Deaths"
-        value="logdaily" onclick="changeMode(this)">
-      <label for="mode4">Daily cases (logarithm)</label>
-      -->
+        <!--
+        <li>
+          <input type="radio" name="mode" id="mode4"
+          charttitle="Logarithmic Daily Confirmed Cases and Deaths"
+          value="logdaily" onclick="changeMode(this)">
+          <label for="mode4">Daily cases (logarithm)</label>
+        </li>
+        -->
 
-      <input type="radio" name="mode" id="mode6"
-        charttitle="Daily Confirmed Cases and Deaths per Million People"
-        value="percapitadaily" onclick="changeMode(this)">
-      <label for="mode6">Daily per capita</label>
+        <li>
+          <input type="radio" name="mode" id="mode6"
+          charttitle="Daily Confirmed Cases and Deaths per Million People"
+          value="percapitadaily" onclick="changeMode(this)">
+          <label for="mode6">Daily per capita</label>
+        </li>
+      </ul>
     </div>
   </div>
+<<<<<<< HEAD
   <div id="graph"></div>
   <div id="help" class="hidden">
     <div id="helpcontainer">
@@ -89,6 +116,9 @@
       <p>The map markers and choropleth use <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>.</p>
     </div>
   </div>
+=======
+>>>>>>> Update html structure and add styles
   <script type="text/javascript" src="main.js"></script>
+  <script src="https://code.iconify.design/1/1.0.5/iconify.min.js"></script>
 </body>
 </html>
