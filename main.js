@@ -36,7 +36,8 @@ adjustMetaViewport();
 let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
-  zoom: 5
+  zoom: 5,
+  max: 14
 });
 let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
 osmLayer.attribution(
@@ -292,7 +293,7 @@ Promise.all(promises).then(() => {
         return (counties[d.fips].data[dateVal].confirmed || 0) / counties[d.fips].population / rates.confirmed;
       }
     })
-    .visible($('#county_confirmed')[0].checked);
+    .visible($('#county_confirmed').prop('checked'));
   countyLayer.createFeature('polygon')
     .data(countyLayer.features()[0].data())
     .position(countyLayer.features()[0].position())
@@ -309,7 +310,7 @@ Promise.all(promises).then(() => {
         return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
       }
     })
-    .visible($('#county_deaths')[0].checked);
+    .visible($('#county_deaths').prop('checked'));
   countyLayer.features()[0]
     .geoOn(geo.event.feature.mouseon, countyHover)
     .geoOn(geo.event.feature.mouseoff, function (evt) {
@@ -376,7 +377,7 @@ function parseCSSE(csv, datakey) {
 }
 
 function makeDots() {
-  useSamples = $('#samples')[0].checked;
+  useSamples = $('#samples').prop('checked');
   let proportion = useSamples ? +$('#sampling').val() : 1;
 
   let points = [];
@@ -553,7 +554,9 @@ function playStart() {
   }
   playing = true;
   setDatePos(datePos + 1);
-  playTimer = window.setTimeout(playStart, datePos !== dateList.length - 1 ? 1000 / speed : (10000 / speed));
+  if (datePos !== dateList.length - 1) {
+    playTimer = window.setTimeout(playStart, 1000 / speed);
+  }
   updateView();
 }
 
