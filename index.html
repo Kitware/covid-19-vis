@@ -28,21 +28,35 @@
       </div>
     </div>
     <div id="timeline" class="control">
-      <button onclick="playAction('play')">
-        <span class="iconify" data-icon="mdi:play"></span>
-      </button>
-      <button onclick="playAction('step')">
-        <span class="iconify" data-icon="mdi:step-forward"></span>
-      </button>
-      <button onclick="playAction('stop')">
-        <span class="iconify" data-icon="mdi:stop"></span>
-      </button>
-      FPS <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
-      <input id="curtime" onchange="setTime()"/>
-      <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
-      <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
-      <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
-      <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
+      <div class="speed">
+        <label>FPS</label> <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
+      </div>
+      <div class="playback-controls">
+        <button onclick="playAction('play')">
+          <span class="iconify" data-icon="mdi:play"></span>
+        </button>
+        <button onclick="playAction('step')">
+          <span class="iconify" data-icon="mdi:step-forward"></span>
+        </button>
+        <button onclick="playAction('stop')">
+          <span class="iconify" data-icon="mdi:stop"></span>
+        </button>
+      </div>
+      <div class="scrubber">
+        <input id="scrubber" type="range" min="0" value="0" oninput="setTime('#scrubber', true)"></input>
+        <input id="curtime" onchange="setTime()" />
+      </div>
+      <div class="marker-controls">
+        <span class="marker-checkbox">
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
+        </span>
+        <span class="marker-checkbox">
+          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
+        </span>
+        <span class="marker-checkbox">
+          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
+        </span>
+      </div>
       <!--
       <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
       <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
