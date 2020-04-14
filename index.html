@@ -5,7 +5,7 @@
   <meta name="viewport" content="user-scalable=no">
   <link rel="icon" href="data:,">
   <title>
-    COVID-19 US Visualizer
+    COVID-19 Visualizer
   </title>
   <script type="text/javascript" src="polybool.min.js"></script>
   <script type="text/javascript" src="geo.min.js"></script>
@@ -28,8 +28,8 @@
       </div>
     </div>
     <div id="timeline" class="control">
-      <div class="speed">
-        <label>FPS</label> <input id="speed" value="1" onchange="if(playing)playAction('play')" title="Maximum frames-per-second of playback, limited to browser performance"/>
+      <div class="speed" title="Maximum frames-per-second of playback, limited to browser performance">
+        <label>fps</label> <input id="speed" value="1" onchange="if(playing)playAction('play')"/>
       </div>
       <div class="playback-controls">
         <button onclick="playAction('play')">
@@ -47,15 +47,15 @@
         <input id="curtime" onchange="setTime()" />
       </div>
       <div class="marker-controls">
-        <span class="marker-checkbox">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><label for="markers">Markers</label>
-        </span>
-        <span class="marker-checkbox">
-          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><label for="county_confirmed">Confirmed</label>
-        </span>
-        <span class="marker-checkbox">
-          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><label for="county_deaths">Deaths</label>
-        </span>
+        <label class="marker-checkbox" for="markers">
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Markers</span>
+        </label>
+        <label class="marker-checkbox" for="county_confirmed">
+          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Confirmed</span>
+        </label>
+        <label class="marker-checkbox" for="county_deaths">
+          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Deaths</span>
+        </label>
       </div>
       <!--
       <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
@@ -66,49 +66,44 @@
   <div id="graphparent" class="control">
     <div class="panel no-pad">
       <ul class="radio-controls">
-        <li>
+        <label for="mode1">
           <input type="radio" name="mode" id="mode1" value="total"
           charttitle="Total Confirmed Cases and Deaths"
           onclick="changeMode(this)" checked>
-          <label for="mode1">Total cases</label>
-        </li>
-
-        <li>
+          <span>Total cases</span>
+        </label>
+        <label for="mode3">
           <input type="radio" name="mode" id="mode3"
           charttitle="Logarithmic Total Confirmed Cases and Deaths"
           value="logtotal" onclick="changeMode(this)">
-          <label for="mode3">Total cases (logarithm)</label>
-        </li>
-
-        <li>
+          <span>Total cases (logarithm)</span>
+        </label>
+        <label for="mode5">
           <input type="radio" name="mode" id="mode5"
           charttitle="Total Confirmed Cases and Deaths per Million People"
           value="percapitatotal" onclick="changeMode(this)">
-          <label for="mode5">Total per capita</label>
-        </li>
-
-        <li>
+          <span>Total per capita</span>
+        </label>
+        <label for="mode2">
           <input type="radio" name="mode" id="mode2"
           charttitle="Daily Confirmed Cases and Deaths"
           value="daily" onclick="changeMode(this)">
-          <label for="mode2">Daily cases</label>
-        </li>
-
+          <span>Daily cases</span>
+        </label>
         <!--
-        <li>
+        <label for="mode4">
           <input type="radio" name="mode" id="mode4"
           charttitle="Logarithmic Daily Confirmed Cases and Deaths"
           value="logdaily" onclick="changeMode(this)">
-          <label for="mode4">Daily cases (logarithm)</label>
-        </li>
+          <span>Daily cases (logarithm)</span>
+        </label>
         -->
-
-        <li>
+        <label for="mode6">
           <input type="radio" name="mode" id="mode6"
           charttitle="Daily Confirmed Cases and Deaths per Million People"
           value="percapitadaily" onclick="changeMode(this)">
-          <label for="mode6">Daily per capita</label>
-        </li>
+          <span>Daily per capita</span>
+        </label>
       </ul>
     </div>
     <div id="graph"></div>

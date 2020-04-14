@@ -5,7 +5,7 @@
 /* This adjusts the requested screen size for mobile devices.  It responds to
  * oreintation changes on Chrome on Android, but not on Firefox on Android. */
 function adjustMetaViewport() {
-  let minArea = 360 * 540 * 3, minWidth = 550, minHeight = 520;
+  let minArea = 360 * 540 * 4, minWidth = 550, minHeight = 520;
   let viewport = document.querySelector('meta[name=viewport]');
   if (viewport) {
     document.head.removeChild(viewport);

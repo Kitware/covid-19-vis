@@ -67,16 +67,16 @@ h1 {
   padding: 0;
 }
 
-#graphparent .radio-controls li {
+#graphparent .radio-controls label {
   font-size: 12px;
   padding: 8px 6px 10px;
 }
 
-#graphparent .radio-controls li:hover {
+#graphparent .radio-controls label:hover {
   background: rgba(84, 110, 122, .08);
 }
 
-#graphparent .radio-controls li input {
+#graphparent .radio-controls label input {
   width: auto;
 }
 
@@ -237,7 +237,7 @@ h1 {
     display: inline;
   }
 
-  #graphparent .radio-controls li {
+  #graphparent .radio-controls label {
     padding: 3px 5px;
     width: 33%;
   }
