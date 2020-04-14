@@ -1,11 +1,15 @@
 COVID-19 Visualization
 ======================
 
-Each dot represents a person.  Only a random proportion of the total population is represented.  The dots are randomly placed in the county of residence.  The sampling control determines how many dots are shown (1 per *sampling* number in the population).
+This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.
 
-The counties are shaded based on the highest per-capita values for each data field (transparent is zero, opaque is the highest per-capita value).
+The data is per county in the US.  When showing markers, markers are distributed randomly through each county based on the number present.  These markers **do not represent actual people or locations**.
 
-The data on the graph is based on the counties in the current window; counties that are partially visible are weighted proprotionate to the area that is visible.
+One marker is drawn per confirmed case (yellow) or death (purple).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.
+
+Counties can also be shaded based on the number of cases or deaths per capita, with the county with the most extreme value shown as a solid color, and those with less incidents per capita shown with a translucent color.
+      
+The graph data is based on the counties on the visible map.  Zooming or panning the map will adjust the graph.  Values include all visible counties, with partially visible counties included proportionate to their visible area.
 
 Data Source
 -----------
