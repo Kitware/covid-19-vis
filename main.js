@@ -160,8 +160,8 @@ function loadChart(data) {
         x: 'x',
         columns: data,
         colors: {
-          confirmed: '#ff8000',
-          deaths: '#000000'
+          confirmed: '#e6cd67',
+          deaths: '#9a014e'
         }
       },
 
@@ -301,7 +301,7 @@ Promise.all(promises).then(() => {
       uniformPolygon: true,
       stroke: false,
       fill: true,
-      fillColor: {r: 1, g: 0.5, b: 0},
+      fillColor: {r: 0.9, g: 0.8, b: 0.4},
       fillOpacity: (p, i, d, j) => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
@@ -318,7 +318,7 @@ Promise.all(promises).then(() => {
       uniformPolygon: true,
       stroke: false,
       fill: true,
-      fillColor: 'black',
+      fillColor: {r: 0.6, g: 0, b: 0.3},
       fillOpacity: (p, i, d, j) => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
@@ -436,12 +436,16 @@ function makeDots() {
 }
 
 function updateMarkerStyle() {
-  let dc = {r: 0, g: 0, b: 0}, cc = {r: 1, g: 0.5, b: 0}, oc = {r: 0, g: 0, b: 1};
+  let dc = {r: 0.6, g: 0, b: 0.3}, cc = {r: 0.9, g: 0.8, b: 0.4}, oc = {r: 0, g: 0, b: 1};
   let dop = 1, cop = 0.75, oop = 0.25;
+  let dr = 9, cr = 8, or = 6;
   if (!useSamples) {
     dop = 0.25;
     cop = 0.25;
     oop = 0.0001;
+    dr = 7;
+    cr = 6;
+    or = 0.0001;
   }
   let data = markers.data(), datalen = data.length, d, c, i, i3;
   let mapper = markers.actors()[0].mapper();
@@ -457,7 +461,7 @@ function updateMarkerStyle() {
     d = data[i];
     c = d.c.data[dateVal];
     if (d.id < c.deaths) {
-      radius[i] = 7; // 9;
+      radius[i] = dr;
       symbol[i] = geo.markerFeature.symbols.star12 * 64;
       symbolValue[i] = 0.75;
       fillColor[i3] = dc.r;
@@ -465,7 +469,7 @@ function updateMarkerStyle() {
       fillColor[i3 + 2] = dc.b;
       fillOpacity[i] = dop;
     } else if (d.id < c.confirmed) {
-      radius[i] = 6; // 8;
+      radius[i] = cr;
       symbol[i] = geo.markerFeature.symbols.jack12 * 64;
       symbolValue[i] = 0.25;
       fillColor[i3] = cc.r;
@@ -473,7 +477,7 @@ function updateMarkerStyle() {
       fillColor[i3 + 2] = cc.b;
       fillOpacity[i] = cop;
     } else {
-      radius[i] = 5; // 6;
+      radius[i] = or;
       symbol[i] = geo.markerFeature.symbols.circle * 64;
       symbolValue[i] = 1;
       fillColor[i3] = oc.r;
