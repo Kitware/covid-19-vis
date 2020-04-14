@@ -341,9 +341,6 @@ Promise.all(promises).then(() => {
   const filt = countiesInArea();
   loadChart(data, 'total');
 
-  d3.select('#graph')
-    .style('position', 'absolute');
-
   map.geoOn(geo.event.pan, _.debounce((evt) => {
     loadChart(refreshChartData(mode, countiesInArea()), mode);
   }, 1000));

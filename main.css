@@ -51,7 +51,7 @@ h1 {
   margin: 25px;
 }
 
-#graph {
+#graphparent {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -59,7 +59,7 @@ h1 {
   z-index: 2000;
 }
 
-#graph .radio-controls {
+#graphparent .radio-controls {
   display: flex;
   flex-wrap: wrap;
   list-style: none;
@@ -67,16 +67,16 @@ h1 {
   padding: 0;
 }
 
-#graph .radio-controls li {
+#graphparent .radio-controls li {
   width: 33.3333%;
   padding: 12px 10px 15px;
 }
 
-#graph .radio-controls li:hover {
+#graphparent .radio-controls li:hover {
   background: rgba(0, 184, 212, .08);
 }
 
-#graph .radio-controls li input {
+#graphparent .radio-controls li input {
   width: auto;
 }
 
