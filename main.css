@@ -22,7 +22,7 @@ h1 {
 }
 
 .control {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.75);
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 5px 30px rgba(0, 0, 0, .15);
@@ -81,7 +81,7 @@ h1 {
 }
 
 #disclaimer {
-  background: rgba(84, 110, 122, .9);
+  background: rgba(84, 110, 122, .75);
   border: 1px solid #546E7A;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
