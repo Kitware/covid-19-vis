@@ -110,18 +110,21 @@
   </div>
   <div id="help" class="hidden">
     <div id="helpcontainer">
-      <div><button onclick="$('#help').toggleClass('hidden')">Close</burron></div>
       <h1>COVID-19 US Visualizer</h1>
       <p>This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.</p>
       <p>The data is per county in the US.
         When showing markers, markers are distributed randomly through each county based on the number present.  These markers <b>do not represent actual people or locations</b>.</p>
       <h2>Modes</h2>
-      <p><b>Markers</b>: One marker is drawn per confirmed case (orange) or death (black).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
-      <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid orange.</p>
-      <p><b>Deaths</b>: Each county is colored based on the number of deaths per capita, with the county with the most extreme value being solid black.</p>
+      <p><b>Markers</b>: One marker is drawn per confirmed case (yellow) or death (purple).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
+      <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid yellow.</p>
+      <p><b>Deaths</b>: Each county is colored based on the number of deaths per capita, with the county with the most extreme value being solid purple.</p>
+      <h2>Graph</h2>
+      <p>Click on the legend of the graph to shoe or hide a line.</p>
+      <p>The graph data is based on the counties on the visible map.  Zooming or panning the map will adjust the graph.  Values include all visible counties, with partially visible counties included proportionate to their visible area.</p>
       <h2>Source Code</h2>
       <p>The source code is on <a href="https://github.com/Kitware/covid-19-vis">GitHub</a>.</p>
       <p>The map markers and choropleth use <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>.</p>
+      <div><button onclick="$('#help').toggleClass('hidden')">Close</burron></div>
     </div>
   </div>
   <script type="text/javascript" src="main.js"></script>
