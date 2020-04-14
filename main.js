@@ -160,8 +160,8 @@ function loadChart(data) {
         x: 'x',
         columns: data,
         colors: {
-          confirmed: '#ff8000',
-          deaths: '#000000'
+          confirmed: '#e6cd67',
+          deaths: '#9a014e'
         }
       },
 
@@ -301,7 +301,7 @@ Promise.all(promises).then(() => {
       uniformPolygon: true,
       stroke: false,
       fill: true,
-      fillColor: {r: 1, g: 0.5, b: 0},
+      fillColor: {r: 0.9, g: 0.8, b: 0.4},
       fillOpacity: (p, i, d, j) => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
@@ -318,7 +318,7 @@ Promise.all(promises).then(() => {
       uniformPolygon: true,
       stroke: false,
       fill: true,
-      fillColor: 'black',
+      fillColor: {r: 0.6, g: 0, b: 0.3},
       fillOpacity: (p, i, d, j) => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
@@ -340,9 +340,6 @@ Promise.all(promises).then(() => {
   const data = refreshChartData('total', countiesInArea());
   const filt = countiesInArea();
   loadChart(data, 'total');
-
-  d3.select('#graph')
-    .style('position', 'absolute');
 
   map.geoOn(geo.event.pan, _.debounce((evt) => {
     loadChart(refreshChartData(mode, countiesInArea()), mode);
@@ -439,7 +436,7 @@ function makeDots() {
 }
 
 function updateMarkerStyle() {
-  let dc = {r: 0, g: 0, b: 0}, cc = {r: 1, g: 0.5, b: 0}, oc = {r: 0, g: 0, b: 1};
+  let dc = {r: 0.6, g: 0, b: 0.3}, cc = {r: 0.9, g: 0.8, b: 0.4}, oc = {r: 0, g: 0, b: 1};
   let dop = 1, cop = 0.75, oop = 0.25;
   let dr = 9, cr = 8, or = 6;
   if (!useSamples) {

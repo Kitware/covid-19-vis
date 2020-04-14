@@ -1,3 +1,9 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Blinker', sans-serif;
+  font-weight: 300;
+}
+
 html,body,#map{
   width: 100%;
   height: 100%;
@@ -5,48 +11,159 @@ html,body,#map{
   margin: 0;
   overflow: hidden;
 }
-#graph {
+
+.no-pad {
+  padding: 0 !important;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.control {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 5px 30px rgba(0, 0, 0, .15);
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  z-index: 100;
+}
+
+.control .panel {
+  padding: 20px;
+}
+
+.top-controls {
+  align-items: flex-start;
+  display: flex;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+
+.top-controls .control {
+  position: static;
+}
+
+#graphparent {
   position: absolute;
   bottom: 0;
   left: 0;
-  background: rgba(255,255,255,0.75);
   padding: 2px;
   z-index: 2000;
 }
 
-#control {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: rgba(255,255,255,0.75);
-  padding: 2px;
-  z-index: 100;
+#graphparent .radio-controls {
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
-#control input {
+
+#graphparent .radio-controls li {
+  font-size: 12px;
+  padding: 8px 6px 10px;
+}
+
+#graphparent .radio-controls li:hover {
+  background: rgba(84, 110, 122, .08);
+}
+
+#graphparent .radio-controls li input {
+  width: auto;
+}
+
+#disclaimer {
+  background: rgba(84, 110, 122, .75);
+  border: 1px solid #546E7A;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  left: 0;
+  top: 0;
+  width: 275px;
+}
+
+#disclaimer .panel {
+  color: #fff;
+  padding: 15px 25px 20px;
+}
+
+#timeline {
+  align-items: stretch;
+  border-top: 3px solid #546E7A;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+  left: 325px;
+  top: 0;
+}
+
+#timeline > div {
+  padding: 0 8px;
+}
+
+#timeline .speed,
+#timeline .playback-controls,
+#timeline .scrubber {
+  align-items: center;
+  display: flex;
+}
+
+#timeline .speed {
+  border-right: 1px solid #ccc;
+  min-width: 81px;
+}
+
+#timeline .speed label {
+  margin-right: 6px;
+}
+
+#timeline .playback-controls {
+  min-width: 145px;
+}
+
+#timeline .marker-controls {
+  border-left: 1px solid #ccc;
+  font-size: 12px;
+  min-width: 100px;
+}
+
+.control input {
   width: 35px;
 }
-#control input[type="checkbox"], #control input[type="radio"] {
+.control input[type="checkbox"], .control input[type="radio"] {
   width: inherit;
   margin-left: 10px;
 }
-#control input[type="range"] {
+.control input[type="range"] {
   width: 300px;
   vertical-align: middle;
 }
-#control #curtime {
+.control #curtime {
   width: 80px;
 }
-#control [for="sampling"] {
+.control [for="sampling"] {
   margin-left: 10px;
 }
-#control #sampling {
+.control #sampling {
   width: 100px;
 }
-#control .title {
+.control .title {
   font-weight: bold;
   font-size: larger;
 }
-#control .note {
+.control .note {
+  display: block;
   font-size: smaller;
 }
 #tooltip {
@@ -68,13 +185,60 @@ html,body,#map{
 #help {
   position: absolute;
   z-index: 3000;
-  max-height: 85vh;
-  top: 5vh;
-  background: rgba(255, 255, 255, 0.75);
-  border: solid black 1px;
-  margin: 10px;
-  padding: 10px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.8);
   overflow-y: auto;
 }
 
+#help #helpcontainer {
+  background: rgba(255, 255, 255, .95);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5), 0 3px 10px rgba(0, 0, 0, .2);
+  margin: 100px auto 0;
+  padding: 25px;
+  max-width: 600px;
+}
 
+
+@media screen and (max-width: 768px) {
+  #help #helpcontainer {
+    margin: 0;
+    height: 100vh;
+    overflow: auto;
+  }
+
+  .top-controls {
+    display: block;
+  }
+
+  #disclaimer {
+    border-radius: 0;
+    width: 100%;
+  }
+
+  #disclaimer h1 {
+    font-size: 14px;
+  }
+
+  #disclaimer .note {
+    font-size: 12px;
+    line-height: 1.1em;
+  }
+
+  #timeline .marker-controls {
+    border: none;
+    padding-left: 0;
+  }
+
+  #timeline .marker-controls .marker-checkbox {
+    display: inline;
+  }
+
+  #graphparent .radio-controls li {
+    padding: 3px 5px;
+    width: 33%;
+  }
+}
