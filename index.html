@@ -48,13 +48,13 @@
       </div>
       <div class="marker-controls">
         <label class="marker-checkbox" for="markers">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Markers</span>
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Dots</span>
         </label>
         <label class="marker-checkbox" for="county_confirmed">
-          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Confirmed</span>
+          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
         </label>
         <label class="marker-checkbox" for="county_deaths">
-          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Deaths</span>
+          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
         </label>
       </div>
       <!--
