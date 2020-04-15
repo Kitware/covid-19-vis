@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="user-scalable=no">
-  <link rel="icon" href="data:,">
+  <link rel="shortcut icon" type="image/png" href="favicon.png">
   <title>
     COVID-19 Visualizer
   </title>
@@ -48,7 +48,7 @@
       </div>
       <div class="marker-controls">
         <label class="marker-checkbox" for="markers" title="Show one dot per confirmed case or reported death">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Dots</span>
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Dots</span>
         </label>
         <label class="marker-checkbox" for="county_confirmed" title="Show a heatmap of confirmed cases per million by county">
           <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
