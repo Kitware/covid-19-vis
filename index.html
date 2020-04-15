@@ -32,13 +32,13 @@
         <label>fps</label> <input id="speed" value="1" onchange="if(playing)playAction('play')"/>
       </div>
       <div class="playback-controls">
-        <button onclick="playAction('play')">
+        <button onclick="playAction('play')" title="Animate daily data on the map">
           <span class="iconify" data-icon="mdi:play"></span>
         </button>
         <button onclick="playAction('step')">
-          <span class="iconify" data-icon="mdi:step-forward"></span>
+          <span class="iconify" data-icon="mdi:step-forward" title="Advance the displayed date by one day"></span>
         </button>
-        <button onclick="playAction('stop')">
+        <button onclick="playAction('stop')" title="Stop animation of daily data">
           <span class="iconify" data-icon="mdi:stop"></span>
         </button>
       </div>
