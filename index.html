@@ -124,32 +124,34 @@
       </p>
 
       <p>
-        The map displays a colored dot for each and every <i>confirmed case</i>
-        (in yellow) and <i>reported death</i> (in red). The slider at the top
-        lets you select a date. If you hit the play button, the map will animate
-        and you can watch the pandemic unfold over time.
+        <b>Dots for each COVID-19 case.</b> The map displays a colored dot for
+        each and every <i>confirmed case</i> (in yellow) and <i>reported
+        death</i> (in red). The slider at the top lets you select a date. If you
+        hit the play button, the map will animate and you can watch the pandemic
+        unfold over time.
       </p>
 
       <p>
-        A time series chart in the lower left corner displays the aggregate data
-        over time. This chart helps visualize the progression of the
-        disease--you can see an exponential rise as the first infections began
-        to spread out of control. The chart has different modes: for instance,
-        the logarithmic mode shows how the rate of infection has changed over
-        time, jumping up suddenly before beginning a slow tapering off towards
-        the end of March.
+        <b>Time series chart.</b> A time series chart in the lower left corner
+        displays the aggregate data over time. This chart helps visualize the
+        progression of the disease--you can see an exponential rise as the first
+        infections began to spread out of control. The chart has different
+        modes: for instance, the logarithmic mode shows how the rate of
+        infection has changed over time, jumping up suddenly before beginning a
+        slow tapering off towards the end of March. You can also click on the
+        legend to hide or show the different lines.
       </p>
 
       <p>
-        The map is interactive as well: you can pan from place to place by
-        clicking (or touching) and dragging, and zoom in and out by using the
-        mouse wheel (or by pinching), and you can even rotate the map by
-        clicking and dragging while holding the Control key (or by using
-        two-finger rotation).
+        <b>Interactive map.</b> The map is interactive as well: you can pan from
+        place to place by clicking (or touching) and dragging, and zoom in and
+        out by using the mouse wheel (or by pinching), and you can even rotate
+        the map by clicking and dragging while holding the Control key (or by
+        using two-finger rotation).
       </p>
 
       <p>
-        Note that <b>this map does not have accurate location information for
+        Note that this map <b>does not have accurate location information for
         the confirmed cases and reported deaths</b>. The dots representing each
         case are randomly distributed throughout the county they are reported
         in--this is meant to give a general sense for geographic distribution
@@ -159,29 +161,26 @@
       </p>
 
       <p>
-        As you move and zoom, the chart in the corner will update in real time
-        to show only the data visible in the map. That means you can get a
-        window into time by using the slider, and into space by using the map to
-        zero in on areas of interest. Check out how Seattle's epidemic began a
-        little bit before New York's, or the sudden onset that occurred in
-        Louisiana.
+        <b>Dynamic updates.</b> As you move and zoom, the chart in the corner
+        will update in real time to show only the data visible in the map. That
+        means you can get a window into time by using the slider, and into space
+        by using the map to zero in on areas of interest. Check out how
+        Seattle's epidemic began a little bit before New York's, or the sudden
+        onset that occurred in Louisiana.
       </p>
 
       <p>
-        Finally, the visualization includes a heatmap mode showing the per
-        capita rates of confirmed cases and reported deaths in each county. Use
-        the checkboxes in the top bar to activate this mode. You may find it
-        useful to additionally toggle the checkbox for the dots so the heatmap
-        is more visible.
+        <b>County-level heatmap.</b> Finally, the visualization includes a
+        heatmap mode showing the per capita rates of confirmed cases and
+        reported deaths in each county. Use the checkboxes in the top bar to
+        activate this mode. You may find it useful to additionally toggle the
+        checkbox for the dots so the heatmap is more visible. The colors in this
+        heatmap run from a deep yellow for the county with the highest per
+        capita confirmed case rate, to white for no confirmed cases or deaths,
+        to a deep red for the county with the highest reported per capita death
+        rate.
       </p>
 
-      <h2>Modes</h2>
-      <p><b>Markers</b>: One marker is drawn per confirmed case (yellow) or death (red).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
-      <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid yellow.</p>
-      <p><b>Deaths</b>: Each county is colored based on the number of deaths per capita, with the county with the most extreme value being solid red.</p>
-      <h2>Graph</h2>
-      <p>Click on the legend of the graph to show or hide a line.</p>
-      <p>The graph data is based on the counties on the visible map.  Zooming or panning the map will adjust the graph.  Values include all visible counties, with partially visible counties included proportionate to their visible area.</p>
       <h2>Source Code</h2>
       <p>The source code is on <a href="https://github.com/Kitware/covid-19-vis">GitHub</a>.</p>
       <p>The map markers and choropleth use <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>.</p>

@@ -12,6 +12,10 @@ html,body,#map{
   overflow: hidden;
 }
 
+b {
+  font-weight: bold;
+}
+
 .no-pad {
   padding: 0 !important;
 }
