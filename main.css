@@ -143,6 +143,7 @@ h1 {
 #timeline .marker-controls {
   border-left: 1px solid #ccc;
   font-size: 14px;
+  line-height: 30px;
   min-width: 100px;
 }
 
