@@ -50,10 +50,10 @@
         <label class="marker-checkbox" for="markers" title="Show one dot per confirmed case or reported death">
           <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Dots</span>
         </label>
-        <label class="marker-checkbox" for="county_confirmed" title="Show a heatmap of confirmed cases per capita by county">
+        <label class="marker-checkbox" for="county_confirmed" title="Show a heatmap of confirmed cases per million by county">
           <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
         </label>
-        <label class="marker-checkbox" for="county_deaths" title="Show a heatmap of confirmed cases per capita by county">
+        <label class="marker-checkbox" for="county_deaths" title="Show a heatmap of confirmed cases per million by county">
           <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
         </label>
       </div>
@@ -82,7 +82,7 @@
           <input type="radio" name="mode" id="mode5"
           charttitle="Total Confirmed Cases and Deaths per Million People"
           value="percapitatotal" onclick="changeMode(this)">
-          <span>Total per capita</span>
+          <span>Total per Million</span>
         </label>
         <label for="mode2">
           <input type="radio" name="mode" id="mode2"
@@ -102,7 +102,7 @@
           <input type="radio" name="mode" id="mode6"
           charttitle="Daily Confirmed Cases and Deaths per Million People"
           value="percapitadaily" onclick="changeMode(this)">
-          <span>Daily per capita</span>
+          <span>Daily Cases per Million</span>
         </label>
       </ul>
     </div>
