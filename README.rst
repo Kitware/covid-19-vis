@@ -5,7 +5,7 @@ This shows confirmed cases and deaths, as reported by the <a href="https://githu
 
 The data is per county in the US.  When showing markers, markers are distributed randomly through each county based on the number present.  These markers **do not represent actual people or locations**.
 
-One marker is drawn per confirmed case (yellow) or death (purple).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.
+One marker is drawn per confirmed case (yellow) or death (red).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.
 
 Counties can also be shaded based on the number of cases or deaths per capita, with the county with the most extreme value shown as a solid color, and those with less incidents per capita shown with a translucent color.
       
