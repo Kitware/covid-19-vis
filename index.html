@@ -111,9 +111,70 @@
   <div id="help" class="hidden" onclick="$('#help').toggleClass('hidden', true)">
     <div id="helpcontainer" onclick="event.stopPropagation()">
       <h1>COVID-19 Visualizer</h1>
-      <p>This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.</p>
-      <p>The data is per county in the US.
-        When showing markers, markers are distributed randomly through each county based on the number present.  These markers <b>do not represent actual people or locations</b>.</p>
+
+      <p>
+        The COVID-19 pandemic has disrupted our regular lives with its
+        astonishing rate of infection and worldwide spread. This visualization
+        displays the <a href="https://github.com/CSSEGISandData/COVID-19">Johns
+        Hopkins COVID-19 dataset</a> on an interactive map, animated over time
+        from the start of the outbreak to the current day. The visualization stays
+        up-to-date with the dataset as Johns Hopkins adds new figures, so check
+        back often to see how things are progressing (and, hopefully, slowing
+        down).
+      </p>
+
+      <p>
+        The map displays a colored dot for each and every <i>confirmed case</i>
+        (in yellow) and <i>reported death</i> (in red). The slider at the top
+        lets you select a date. If you hit the play button, the map will animate
+        and you can watch the pandemic unfold over time.
+      </p>
+
+      <p>
+        A time series chart in the lower left corner displays the aggregate data
+        over time. This chart helps visualize the progression of the
+        disease--you can see an exponential rise as the first infections began
+        to spread out of control. The chart has different modes: for instance,
+        the logarithmic mode shows how the rate of infection has changed over
+        time, jumping up suddenly before beginning a slow tapering off towards
+        the end of March.
+      </p>
+
+      <p>
+        The map is interactive as well: you can pan from place to place by
+        clicking (or touching) and dragging, and zoom in and out by using the
+        mouse wheel (or by pinching), and you can even rotate the map by
+        clicking and dragging while holding the Control key (or by using
+        two-finger rotation).
+      </p>
+
+      <p>
+        Note that <b>this map does not have accurate location information for
+        the confirmed cases and reported deaths</b>. The dots representing each
+        case are randomly distributed throughout the county they are reported
+        in--this is meant to give a general sense for geographic distribution
+        according to the raw data. At close zoom levels, these visuals can be
+        used to give you a general sense for the situation in a particular
+        neighborhood.
+      </p>
+
+      <p>
+        As you move and zoom, the chart in the corner will update in real time
+        to show only the data visible in the map. That means you can get a
+        window into time by using the slider, and into space by using the map to
+        zero in on areas of interest. Check out how Seattle's epidemic began a
+        little bit before New York's, or the sudden onset that occurred in
+        Louisiana.
+      </p>
+
+      <p>
+        Finally, the visualization includes a heatmap mode showing the per
+        capita rates of confirmed cases and reported deaths in each county. Use
+        the checkboxes in the top bar to activate this mode. You may find it
+        useful to additionally toggle the checkbox for the dots so the heatmap
+        is more visible.
+      </p>
+
       <h2>Modes</h2>
       <p><b>Markers</b>: One marker is drawn per confirmed case (yellow) or death (red).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
       <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid yellow.</p>
