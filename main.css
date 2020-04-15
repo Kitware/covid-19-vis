@@ -204,6 +204,8 @@ h1 {
 
 button.help {
   float: right;
+  font-weight: bold;
+  font-size: medium;
 }
 
 @media screen and (max-width: 768px) {
