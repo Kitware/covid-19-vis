@@ -36,6 +36,10 @@ h1 {
   z-index: 100;
 }
 
+.control .iconify {
+  font-size: x-large;
+}
+
 .control .panel {
   padding: 20px;
 }
