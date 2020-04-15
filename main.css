@@ -12,6 +12,10 @@ html,body,#map{
   overflow: hidden;
 }
 
+b {
+  font-weight: bold;
+}
+
 .no-pad {
   padding: 0 !important;
 }
@@ -30,6 +34,10 @@ h1 {
   padding: 0;
   position: absolute;
   z-index: 100;
+}
+
+.control .iconify {
+  font-size: x-large;
 }
 
 .control .panel {
@@ -134,7 +142,8 @@ h1 {
 
 #timeline .marker-controls {
   border-left: 1px solid #ccc;
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 30px;
   min-width: 100px;
 }
 

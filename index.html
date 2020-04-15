@@ -24,7 +24,7 @@
       <div class="panel">
         <button class="help" onclick="$('#help').toggleClass('hidden')">Help</button>
         <h1 class="title">COVID-19 Visualizer</h1>
-        <span class="note">Markers are randomly placed in each county and DO NOT represent specific people or real locations.</span>
+        <span class="note">Dots are randomly placed in each county and DO NOT represent specific people or real locations.</span>
       </div>
     </div>
     <div id="timeline" class="control">
@@ -32,13 +32,13 @@
         <label>fps</label> <input id="speed" value="1" onchange="if(playing)playAction('play')"/>
       </div>
       <div class="playback-controls">
-        <button onclick="playAction('play')">
+        <button onclick="playAction('play')" title="Animate daily data on the map">
           <span class="iconify" data-icon="mdi:play"></span>
         </button>
         <button onclick="playAction('step')">
-          <span class="iconify" data-icon="mdi:step-forward"></span>
+          <span class="iconify" data-icon="mdi:step-forward" title="Advance the displayed date by one day"></span>
         </button>
-        <button onclick="playAction('stop')">
+        <button onclick="playAction('stop')" title="Stop animation of daily data">
           <span class="iconify" data-icon="mdi:stop"></span>
         </button>
       </div>
@@ -47,14 +47,14 @@
         <input id="curtime" onchange="setTime()" />
       </div>
       <div class="marker-controls">
-        <label class="marker-checkbox" for="markers">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Markers</span>
+        <label class="marker-checkbox" for="markers" title="Show one dot per confirmed case or reported death">
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Dots</span>
         </label>
-        <label class="marker-checkbox" for="county_confirmed">
-          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Confirmed</span>
+        <label class="marker-checkbox" for="county_confirmed" title="Show a heatmap of confirmed cases per million by county">
+          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
         </label>
-        <label class="marker-checkbox" for="county_deaths">
-          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Deaths</span>
+        <label class="marker-checkbox" for="county_deaths" title="Show a heatmap of confirmed cases per million by county">
+          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
         </label>
       </div>
       <!--
@@ -70,39 +70,39 @@
           <input type="radio" name="mode" id="mode1" value="total"
           charttitle="Total Confirmed Cases and Deaths"
           onclick="changeMode(this)" checked>
-          <span>Total cases</span>
+          <span>Total Cases</span>
         </label>
         <label for="mode3">
           <input type="radio" name="mode" id="mode3"
           charttitle="Logarithmic Total Confirmed Cases and Deaths"
           value="logtotal" onclick="changeMode(this)">
-          <span>Total cases (logarithm)</span>
+          <span>Total Cases (logarithm)</span>
         </label>
         <label for="mode5">
           <input type="radio" name="mode" id="mode5"
           charttitle="Total Confirmed Cases and Deaths per Million People"
           value="percapitatotal" onclick="changeMode(this)">
-          <span>Total per capita</span>
+          <span>Total per Million</span>
         </label>
         <label for="mode2">
           <input type="radio" name="mode" id="mode2"
           charttitle="Daily Confirmed Cases and Deaths"
           value="daily" onclick="changeMode(this)">
-          <span>Daily cases</span>
+          <span>Daily Cases</span>
         </label>
         <!--
         <label for="mode4">
           <input type="radio" name="mode" id="mode4"
           charttitle="Logarithmic Daily Confirmed Cases and Deaths"
           value="logdaily" onclick="changeMode(this)">
-          <span>Daily cases (logarithm)</span>
+          <span>Daily Cases (logarithm)</span>
         </label>
         -->
         <label for="mode6">
           <input type="radio" name="mode" id="mode6"
           charttitle="Daily Confirmed Cases and Deaths per Million People"
           value="percapitadaily" onclick="changeMode(this)">
-          <span>Daily per capita</span>
+          <span>Daily Cases per Million</span>
         </label>
       </ul>
     </div>
@@ -111,20 +111,101 @@
   <div id="help" class="hidden" onclick="$('#help').toggleClass('hidden', true)">
     <div id="helpcontainer" onclick="event.stopPropagation()">
       <h1>COVID-19 Visualizer</h1>
-      <p>This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.</p>
-      <p>The data is per county in the US.
-        When showing markers, markers are distributed randomly through each county based on the number present.  These markers <b>do not represent actual people or locations</b>.</p>
-      <h2>Modes</h2>
-      <p><b>Markers</b>: One marker is drawn per confirmed case (yellow) or death (red).  Markers are randomly distributed within the county for which they are reported.  These do not represent specific people or locations; distribution is only to provide relative densities of cases.</p>
-      <p><b>Confirmed</b>: Each county is colored based on the number of confirmed cases per capita, with the county with the most extreme value being solid yellow.</p>
-      <p><b>Deaths</b>: Each county is colored based on the number of deaths per capita, with the county with the most extreme value being solid red.</p>
-      <h2>Graph</h2>
-      <p>Click on the legend of the graph to show or hide a line.</p>
-      <p>The graph data is based on the counties on the visible map.  Zooming or panning the map will adjust the graph.  Values include all visible counties, with partially visible counties included proportionate to their visible area.</p>
+
+      <p>
+        The COVID-19 pandemic has disrupted our regular lives with its
+        astonishing rate of infection and worldwide spread. This visualization
+        displays the <a href="https://github.com/CSSEGISandData/COVID-19">Johns
+        Hopkins COVID-19 dataset</a> on an interactive map, animated over time
+        from the start of the outbreak to the current day. The visualization stays
+        up-to-date with the dataset as Johns Hopkins adds new figures, so check
+        back often to see how things are progressing (and, hopefully, slowing
+        down).
+      </p>
+
+      <p>
+        <b>Dots for each COVID-19 case.</b> The map displays a colored dot for
+        each and every <i>confirmed case</i> (in yellow) and <i>reported
+        death</i> (in red). The slider at the top lets you select a date. If you
+        hit the play button, the map will animate and you can watch the pandemic
+        unfold over time.
+      </p>
+
+      <p>
+        <b>Time series chart.</b> A time series chart in the lower left corner
+        displays the aggregate data over time. This chart helps visualize the
+        progression of the disease--you can see an exponential rise as the first
+        infections began to spread out of control. The chart has different
+        modes: for instance, the logarithmic mode shows how the rate of
+        infection has changed over time, jumping up suddenly before beginning a
+        slow tapering off towards the end of March. You can also click on the
+        legend to hide or show the different lines.
+      </p>
+
+      <p>
+        <b>Interactive map.</b> The map is interactive as well: you can pan from
+        place to place by clicking (or touching) and dragging, and zoom in and
+        out by using the mouse wheel (or by pinching), and you can even rotate
+        the map by clicking and dragging while holding the Control key (or by
+        using two-finger rotation).
+      </p>
+
+      <p>
+        Note that this map <b>does not have accurate location information for
+        the confirmed cases and reported deaths</b>. The dots representing each
+        case are randomly distributed throughout the county they are reported
+        in--this is meant to give a general sense for geographic distribution
+        according to the raw data. At close zoom levels, these visuals can be
+        used to give you a general sense for the situation in a particular
+        neighborhood.
+      </p>
+
+      <p>
+        <b>Dynamic updates.</b> As you move and zoom, the chart in the corner
+        will update in real time to show only the data visible in the map. That
+        means you can get a window into time by using the slider, and into space
+        by using the map to zero in on areas of interest. Check out how
+        Seattle's epidemic began a little bit before New York's, or the sudden
+        onset that occurred in Louisiana.
+      </p>
+
+      <p>
+        <b>County-level heatmap.</b> Finally, the visualization includes a
+        heatmap mode showing the per capita rates of confirmed cases and
+        reported deaths in each county. Use the checkboxes in the top bar to
+        activate this mode. You may find it useful to additionally toggle the
+        checkbox for the dots so the heatmap is more visible. The colors in this
+        heatmap run from a deep yellow for the county with the highest per
+        capita confirmed case rate, to white for no confirmed cases or deaths,
+        to a deep red for the county with the highest reported per capita death
+        rate.
+      </p>
+
       <h2>Source Code</h2>
-      <p>The source code is on <a href="https://github.com/Kitware/covid-19-vis">GitHub</a>.</p>
-      <p>The map markers and choropleth use <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>.</p>
-      <div><button onclick="$('#help').toggleClass('hidden')">Close</burron></div>
+
+      <p>
+        The <a href="https://github.com/Kitware/covid-19-vis">source code</a> is
+        available on GitHub. Check the code out and play with it, and let us
+        know if you run into problems by filing a bug report or asking a
+        question on the <a href="https://github.com/Kitware/covid-19-vis/issues">issue tracker</a>.
+      </p>
+
+      <p>
+        The map, dots, and heatmap are driven by
+        <a href="https://github.com/OpenGeoscience/geojs">GeoJS</a>, an open
+        source high-performance mapping and visualization toolkit developed at
+        Kitware.
+      </p>
+
+      <h2>Contact Us</h2>
+
+      <p>
+        If you would like to learn more about us or work with us, please
+        <a href="https://www.kitware.com/contact-us/">drop us a note</a> or
+        <a href="mailto:kitware@kitware.com">write us an email</a>.
+      </p>
+
+      <div><button onclick="$('#help').toggleClass('hidden')">Close</button></div>
     </div>
   </div>
   <script type="text/javascript" src="main.js"></script>
