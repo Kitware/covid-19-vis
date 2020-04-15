@@ -1,7 +1,7 @@
 COVID-19 Visualization
 ======================
 
-This shows confirmed cases and deaths, as reported by the <a href="https://github.com/CSSEGISandData/COVID-19">2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE</a>.
+This shows confirmed cases and deaths, as reported by the `2019 Novel Coronavirus COVID-19 (2019-nCoV) Data Repository by Johns Hopkins CSSE <https://github.com/CSSEGISandData/COVID-19>`_.
 
 The data is per county in the US.  When showing markers, markers are distributed randomly through each county based on the number present.  These markers **do not represent actual people or locations**.
 
