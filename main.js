@@ -2,6 +2,19 @@
 /* eslint no-unused-vars: 0 */
 /* eslint comma-dangle: 0 */
 
+/* Query parameters:
+ *  left, top, right, bottom: bounding extend of the map in degrees latitude
+ *    longitude.  This area will be entirely visible; depending on the window
+ *    shape, additional area will be visible.
+ *  zoomout: if specified, the map will "zoom out" by this factor after
+ *    framing the bounding area.  The default is 0.25.
+ *  confirmed: either 'true' or 'false' to show confirmed choropleth.
+ *  deaths: either 'true' or 'false' to show deaths choropleth.
+ *  markers: either 'true' or 'false' to show markers.
+ *  mode: one of 'total', 'logtotal', 'percapitatotal', 'daily', 'logdaily',
+ *    or 'percapitadaily' to specify initial graph mode.
+ */
+
 /* This adjusts the requested screen size for mobile devices.  It responds to
  * oreintation changes on Chrome on Android, but not on Firefox on Android. */
 function adjustMetaViewport() {
@@ -33,6 +46,38 @@ function adjustMetaViewport() {
 window.onorientationchange = adjustMetaViewport;
 adjustMetaViewport();
 
+/* Decode query components into a dictionary of values.
+ *
+ * @returns {object}: the query parameters as a dictionary.
+ */
+function getQuery() {
+  var query = document.location.search.replace(/(^\?)/, '').split(
+    '&').map(function (n) {
+    n = n.split('=');
+    if (n[0]) {
+      this[decodeURIComponent(n[0].replace(/\+/g, '%20'))] = decodeURIComponent(n[1].replace(/\+/g, '%20'));
+    }
+    return this;
+  }.bind({}))[0];
+  return query;
+}
+
+let query = getQuery();
+
+if (query.confirmed !== undefined) {
+  $('#county_confirmed').prop('checked', query.confirmed === 'true');
+}
+if (query.deaths !== undefined) {
+  $('#county_deaths').prop('checked', query.deaths === 'true');
+}
+if (query.markers !== undefined) {
+  $('#markers').prop('checked', query.markers === 'true');
+}
+if (query.mode !== undefined) {
+  $('input[name="mode"][value="' + query.mode + '"]').prop('checked', true);
+}
+let mode = $('input[name="mode"]:checked').attr('value');
+
 let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
@@ -40,8 +85,13 @@ let map = geo.map({
   max: 14
 });
 /* Got to the continental United States and zoom out a bit */
-map.bounds({left: -124.85, top: 49.39, right: -66.88, bottom: 24.39});
-map.zoom(map.zoom() - 0.25);
+map.bounds({
+  left: query.left !== undefined ? +query.left : -124.85,
+  top: query.top !== undefined ? +query.top : 49.39,
+  right: query.right !== undefined ? +query.right : -66.88,
+  bottom: query.bottom !== undefined ? +query.bottom : 24.39
+});
+map.zoom(map.zoom() - (query.zoomout !== undefined ? +query.zoomout : 0.25));
 let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
 osmLayer.attribution(
   osmLayer.attribution() +
@@ -56,7 +106,8 @@ let groups = {
 let playing = false, speed = 1, lastspeed, playTimer;
 
 let countyLayer = map.createLayer('feature', {features: ['polygon']});
-let dotLayer = map.createLayer('feature', {features: ['marker']});
+let dotLayer = map.createLayer('feature', {features: ['marker']})
+  .visible($('#markers').prop('checked'));
 let markers = dotLayer.createFeature('marker', {primitiveShape: 'sprite'});
 countyLayer.visible(false);
 let uiLayer = map.createLayer('ui', {zIndex: 3});
@@ -215,7 +266,6 @@ function loadChart(data) {
   }
 }
 
-let mode = 'total';
 function changeMode(radio) {
   mode = radio.value;
 
@@ -337,7 +387,7 @@ Promise.all(promises).then(() => {
   updateView();
 
   // Set up the chart.
-  const data = refreshChartData('total', countiesInArea());
+  const data = refreshChartData(mode, countiesInArea());
   const filt = countiesInArea();
   loadChart(data, 'total');
 
