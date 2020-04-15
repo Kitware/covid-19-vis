@@ -48,7 +48,7 @@
       </div>
       <div class="marker-controls">
         <label class="marker-checkbox" for="markers">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked).draw()"></input><span>Markers</span>
+          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Markers</span>
         </label>
         <label class="marker-checkbox" for="county_confirmed">
           <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Confirmed</span>
