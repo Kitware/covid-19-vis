@@ -217,6 +217,29 @@ button.help {
   font-size: medium;
 }
 
+.loading {
+  position: absolute;
+  z-index: 4000;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+.loading.hidden {
+  display: none;
+}
+.loadingtext {
+  line-height: 1.5em;
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 @media screen and (max-width: 768px) {
   #help #helpcontainer {
     margin: 0;

@@ -395,6 +395,8 @@ Promise.all(promises).then(() => {
     loadChart(refreshChartData(mode, countiesInArea()), mode);
   }, 1000));
 
+  $('.loading').addClass('hidden');
+
   return null;
 });
 
