@@ -481,6 +481,7 @@ function makeDots() {
   markers.gcs(map.gcs());
   markers.style({
     strokeWidth: 0,
+    strokeOpacity: 0,
     fillOpacity: 0.001
   });
   markers.draw();
@@ -494,10 +495,10 @@ function updateMarkerStyle() {
   if (!useSamples) {
     dop = 0.25;
     cop = 0.25;
-    oop = 0.0001;
+    oop = 0;
     dr = 7;
     cr = 6;
-    or = 0.0001;
+    or = 0;
   }
   let data = markers.data(), datalen = data.length, d, c, i, i3;
   let mapper = markers.actors()[0].mapper();
@@ -609,6 +610,8 @@ function playStart() {
   setDatePos(datePos + 1);
   if (datePos !== dateList.length - 1) {
     playTimer = window.setTimeout(playStart, 1000 / speed);
+  } else {
+    playing = false;
   }
   updateView();
 }
