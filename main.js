@@ -586,7 +586,6 @@ function setTime(elem, value) {
 
 function updateView() {
   updateMarkerStyle();
-  countyLayer.features()[0].modified();
   countyLayer.features()[2].modified();
   countyLayer.features()[3].modified();
   map.draw();
