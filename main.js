@@ -394,6 +394,13 @@ Promise.all(promises).then(() => {
   map.geoOn(geo.event.pan, _.debounce((evt) => {
     loadChart(refreshChartData(mode, countiesInArea()), mode);
   }, 1000));
+  let lastzoom = map.zoom();
+  map.geoOn(geo.event.zoom, (evt) => {
+    if (Math.ceil(map.zoom() / 3) !== Math.ceil(lastzoom / 3)) {
+      updateMarkerStyle();
+    }
+    lastzoom = map.zoom();
+  });
 
   $('.loading').addClass('hidden');
 
@@ -506,7 +513,10 @@ function updateMarkerStyle() {
       symbol = mapper.getSourceBuffer('symbol'),
       symbolValue = mapper.getSourceBuffer('symbolValue'),
       fillColor = mapper.getSourceBuffer('fillColor'),
-      fillOpacity = mapper.getSourceBuffer('fillOpacity');
+      fillOpacity = mapper.getSourceBuffer('fillOpacity'),
+      zoom3ceil = Math.ceil(map.zoom() / 3) * 3,
+      units2perPixel = map.unitsPerPixel(zoom3ceil) ** 2,
+      aggregateConfirmed;
   if (radius.length < datalen) {
     return;
   }
@@ -522,6 +532,9 @@ function updateMarkerStyle() {
       fillColor[i3 + 2] = dc.b;
       fillOpacity[i] = dop;
     } else if (d.id < c.confirmed) {
+      // final multiplier can affect appearance, <=1 is probably safe, 9 looked
+      // okay.
+      aggregateConfirmed = Math.floor(c.confirmed * units2perPixel / d.c.area * 9);
       radius[i] = cr;
       symbol[i] = geo.markerFeature.symbols.jack12 * 64;
       symbolValue[i] = 0.25;
@@ -529,6 +542,14 @@ function updateMarkerStyle() {
       fillColor[i3 + 1] = cc.g;
       fillColor[i3 + 2] = cc.b;
       fillOpacity[i] = cop;
+      if (aggregateConfirmed > 1) {
+        if (i % aggregateConfirmed) {
+          fillOpacity[i] = 0;
+          radius[i] = 0;
+        } else {
+          fillOpacity[i] = 1 - (1 - cop) ** aggregateConfirmed;
+        }
+      }
     } else {
       radius[i] = or;
       symbol[i] = geo.markerFeature.symbols.circle * 64;
