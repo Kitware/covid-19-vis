@@ -254,7 +254,8 @@ function loadChart(data) {
         format: {
           value: (value, ratio, id, index) => {
             if (mode.slice(0, 9) === 'percapita') {
-              return Math.ceil(value) + '/million';
+              let rate = value ? Math.ceil(1e6 / value) : 0;
+              return Math.ceil(value) + '/million' + (rate ? ` (1 in ${rate})` : '');
             } else if (mode.slice(0, 3) === 'log') {
               return value ? Math.round(10 ** value) : 0;
             } else {
@@ -692,8 +693,10 @@ function countyHover(evt) {
     contents.append($('<div class="population"/>').text('Population: ' + tooltipCounty.population));
     contents.append($('<div class="confirmed"/>').text('Confirmed: ' + tooltipCounty.data[dateVal].confirmed));
     contents.append($('<div class="deaths"/>').text('Deaths: ' + tooltipCounty.data[dateVal].deaths));
-    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * tooltipCounty.data[dateVal].confirmed / tooltipCounty.population).toFixed(0)));
-    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * tooltipCounty.data[dateVal].deaths / tooltipCounty.population).toFixed(0)));
+    let crate = tooltipCounty.data[dateVal].confirmed ? Math.ceil(tooltipCounty.population / tooltipCounty.data[dateVal].confirmed) : 0;
+    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * tooltipCounty.data[dateVal].confirmed / tooltipCounty.population).toFixed(0) + (crate ? ` (1 in ${crate})` : '')));
+    let drate = tooltipCounty.data[dateVal].deaths ? Math.ceil(tooltipCounty.population / tooltipCounty.data[dateVal].deaths) : 0;
+    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * tooltipCounty.data[dateVal].deaths / tooltipCounty.population).toFixed(0) + (drate ? ` (1 in ${drate})` : '')));
     if (evt) {
       tooltip.position(evt.mouse.geo);
     }
