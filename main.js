@@ -242,6 +242,19 @@ function loadChart(data) {
         x: {
           lines: [{value: +dateVal}]
         }
+      },
+      tooltip: {
+        format: {
+          value: (value, ratio, id, index) => {
+            if (mode.slice(0, 9) === 'percapita') {
+              return Math.ceil(value) + '/million';
+            } else if (mode.slice(0, 3) === 'log') {
+              return value ? Math.ceil(10 ** value) : 0;
+            } else {
+              return Math.ceil(value);
+            }
+          }
+        }
       }
     });
     chart.internal.main.on('click', function () {
