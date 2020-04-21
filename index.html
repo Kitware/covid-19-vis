@@ -66,6 +66,11 @@
           <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
         </label>
       </div>
+      <div class="marker-controls">
+        <label class="marker-checkbox" for="daily" title="Show daily values for dots and heatmaps">
+          <input id="daily" type="checkbox" onchange="updateView()"></input><span>Daily</span>
+        </label>
+      </div>
       <!--
       <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
       <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
@@ -185,6 +190,14 @@
         run from a deep yellow for the county with the highest per capita
         confirmed case rate, to white for no confirmed cases or deaths, to a
         deep red for the county with the highest reported per capita death rate.
+      </p>
+
+      <p>
+        <b>Daily values.</b> The visualization can either show total values to
+        date or daily values.  When the Daily checkbox is selected, the dots 
+        and heatmap reflect just values for the currently selected date.  For
+        heatmaps, the deepest colors are based on the highest per capita daily
+        rate.
       </p>
 
       <h2>Source Code</h2>

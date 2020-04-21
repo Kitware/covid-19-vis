@@ -129,7 +129,11 @@ let promises = [];
 let dateSet = {};
 let dateList = [];
 let datePos, dateVal;
-let useSamples = false;
+let useSamples = false, dailyValues = false;
+/* Smaller zoomStep values will cause more frequent adjustments to marker
+ * opacity on zooming but reduce the number of fragments visited by the
+ * fragment shader. */
+let zoomStep = 1;
 
 let chart = null;
 function refreshChartData(mode, countyFilter) {
@@ -364,6 +368,16 @@ Promise.all(promises).then(() => {
         rates[k] = rate;
       }
     });
+    Object.values(c.data).forEach(d => {
+      let crate = (d.confirmed - d.confirmed_last) / c.population;
+      if (!rates.confirmed_daily || crate > rates.confirmed_daily) {
+        rates.confirmed_daily = crate;
+      }
+      let drate = (d.deaths - d.deaths_last) / c.population;
+      if (!rates.deaths_daily || drate > rates.deaths_daily) {
+        rates.deaths_daily = drate;
+      }
+    });
   });
   countyLayer.createFeature('polygon')
     .data(countyLayer.features()[0].data())
@@ -378,7 +392,11 @@ Promise.all(promises).then(() => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
         }
-        return (counties[d.fips].data[dateVal].confirmed || 0) / counties[d.fips].population / rates.confirmed;
+        if (!dailyValues) {
+          return (counties[d.fips].data[dateVal].confirmed || 0) / counties[d.fips].population / rates.confirmed;
+        } else {
+          return ((counties[d.fips].data[dateVal].confirmed || 0) - (counties[d.fips].data[dateVal].confirmed_last || 0)) / counties[d.fips].population / rates.confirmed_daily;
+        }
       }
     })
     .visible($('#county_confirmed').prop('checked'));
@@ -395,7 +413,11 @@ Promise.all(promises).then(() => {
         if (!d.fips || !counties[d.fips]) {
           return 0;
         }
-        return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
+        if (!dailyValues) {
+          return (counties[d.fips].data[dateVal].deaths || 0) / counties[d.fips].population / rates.deaths;
+        } else {
+          return ((counties[d.fips].data[dateVal].deaths || 0) - (counties[d.fips].data[dateVal].deaths_last || 0)) / counties[d.fips].population / rates.deaths_daily;
+        }
       }
     })
     .visible($('#county_deaths').prop('checked'));
@@ -418,7 +440,7 @@ Promise.all(promises).then(() => {
   }, 1000));
   let lastzoom = map.zoom();
   map.geoOn(geo.event.zoom, (evt) => {
-    if (Math.ceil(map.zoom() / 3) !== Math.ceil(lastzoom / 3)) {
+    if (Math.ceil(map.zoom() / zoomStep) !== Math.ceil(lastzoom / zoomStep)) {
       updateMarkerStyle();
     }
     lastzoom = map.zoom();
@@ -460,11 +482,14 @@ function parseCSSE(csv, datakey) {
     if (line[keys.Population]) {
       counties[fips].population = parseInt(line[keys.Population], 10);
     }
+    let last = 0;
     dates.forEach(({date, column}) => {
       if (!counties[fips].data[date]) {
         counties[fips].data[date] = {};
       }
       counties[fips].data[date][datakey] = parseInt(line[column], 10);
+      counties[fips].data[date][datakey + '_last'] = last;
+      last = counties[fips].data[date][datakey];
     });
   });
   return null;
@@ -521,7 +546,7 @@ function updateMarkerStyle() {
   let dc = {r: 0.6, g: 0, b: 0.3}, cc = {r: 0.9, g: 0.8, b: 0.4}, oc = {r: 0, g: 0, b: 1};
   let dop = 1, cop = 0.75, oop = 0.25;
   let dr = 9, cr = 8, or = 6;
-  if (!useSamples) {
+  if (!useSamples || dailyValues) {
     dop = 0.25;
     cop = 0.25;
     oop = 0;
@@ -536,16 +561,20 @@ function updateMarkerStyle() {
       symbolValue = mapper.getSourceBuffer('symbolValue'),
       fillColor = mapper.getSourceBuffer('fillColor'),
       fillOpacity = mapper.getSourceBuffer('fillOpacity'),
-      zoom3ceil = Math.ceil(map.zoom() / 3) * 3,
-      units2perPixel = map.unitsPerPixel(zoom3ceil) ** 2,
-      aggregateConfirmed;
+      zoomStepCeil = Math.ceil(map.zoom() / zoomStep) * zoomStep,
+      units2perPixel = map.unitsPerPixel(zoomStepCeil) ** 2,
+      aggregateConfirmed, confirmed, aggregateDeaths, deaths;
   if (radius.length < datalen) {
     return;
   }
   for (i = i3 = 0; i < datalen; i += 1, i3 += 3) {
     d = data[i];
     c = d.c.data[dateVal];
-    if (d.id < c.deaths) {
+    if (d.id < c.deaths && (!dailyValues || d.id >= c.deaths_last)) {
+      deaths = !dailyValues ? c.deaths : c.deaths - c.deaths_last;
+      // final multiplier can affect appearance, <=1 is probably safe, 9 looked
+      // okay.
+      aggregateDeaths = Math.floor(deaths * units2perPixel / d.c.area * 9);
       radius[i] = dr;
       symbol[i] = geo.markerFeature.symbols.star12 * 64;
       symbolValue[i] = 0.75;
@@ -553,10 +582,19 @@ function updateMarkerStyle() {
       fillColor[i3 + 1] = dc.g;
       fillColor[i3 + 2] = dc.b;
       fillOpacity[i] = dop;
-    } else if (d.id < c.confirmed) {
+      if (aggregateDeaths > 1) {
+        if (i % aggregateDeaths) {
+          fillOpacity[i] = 0;
+          radius[i] = 0;
+        } else {
+          fillOpacity[i] = 1 - (1 - dop) ** aggregateDeaths;
+        }
+      }
+    } else if (d.id < c.confirmed && (!dailyValues || d.id > c.confirmed_last)) {
+      confirmed = !dailyValues ? c.confirmed : c.confirmed - c.confirmed_last;
       // final multiplier can affect appearance, <=1 is probably safe, 9 looked
       // okay.
-      aggregateConfirmed = Math.floor(c.confirmed * units2perPixel / d.c.area * 9);
+      aggregateConfirmed = Math.floor(confirmed * units2perPixel / d.c.area * 9);
       radius[i] = cr;
       symbol[i] = geo.markerFeature.symbols.jack12 * 64;
       symbolValue[i] = 0.25;
@@ -582,6 +620,8 @@ function updateMarkerStyle() {
       fillOpacity[i] = oop;
     }
   }
+  // Enable to log how many markers have any opacity.
+  // console.log(fillOpacity.filter(a => a).length);
   mapper.updateSourceBuffer('radius');
   mapper.updateSourceBuffer('symbol');
   mapper.updateSourceBuffer('symbolValue');
@@ -628,6 +668,7 @@ function setTime(elem, value) {
 }
 
 function updateView() {
+  dailyValues = $('#daily').prop('checked');
   updateMarkerStyle();
   countyLayer.features()[2].modified();
   countyLayer.features()[3].modified();
@@ -689,15 +730,25 @@ function countyHover(evt) {
   }
   if (tooltipCounty) {
     let contents = $('<div/>');
+    let confirmed, deaths, prefix;
+    if (!dailyValues) {
+      confirmed = tooltipCounty.data[dateVal].confirmed;
+      deaths = tooltipCounty.data[dateVal].deaths;
+      prefix = 'Total ';
+    } else {
+      confirmed = tooltipCounty.data[dateVal].confirmed - tooltipCounty.data[dateVal].confirmed_last;
+      deaths = tooltipCounty.data[dateVal].deaths - tooltipCounty.data[dateVal].deaths_last;
+      prefix = 'Daily ';
+    }
     contents.append($('<div class="tooltipCounty_name"/>').text(tooltipCounty.fullname));
     contents.append($('<div class="date"/>').text(new Date(+dateList[datePos]).toJSON().substr(0, 10)));
     contents.append($('<div class="population"/>').text('Population: ' + tooltipCounty.population));
-    contents.append($('<div class="confirmed"/>').text('Confirmed: ' + tooltipCounty.data[dateVal].confirmed));
-    contents.append($('<div class="deaths"/>').text('Deaths: ' + tooltipCounty.data[dateVal].deaths));
-    let crate = tooltipCounty.data[dateVal].confirmed ? Math.ceil(tooltipCounty.population / tooltipCounty.data[dateVal].confirmed) : 0;
-    contents.append($('<div class="confirmed_per"/>').text('Confirmed/1M: ' + (1e6 * tooltipCounty.data[dateVal].confirmed / tooltipCounty.population).toFixed(0) + (crate ? ` (1 in ${crate})` : '')));
-    let drate = tooltipCounty.data[dateVal].deaths ? Math.ceil(tooltipCounty.population / tooltipCounty.data[dateVal].deaths) : 0;
-    contents.append($('<div class="deaths_per"/>').text('Deaths/1M: ' + (1e6 * tooltipCounty.data[dateVal].deaths / tooltipCounty.population).toFixed(0) + (drate ? ` (1 in ${drate})` : '')));
+    contents.append($('<div class="confirmed"/>').text(prefix + 'Confirmed: ' + confirmed));
+    contents.append($('<div class="deaths"/>').text(prefix + 'Deaths: ' + deaths));
+    let crate = confirmed ? Math.ceil(tooltipCounty.population / confirmed) : 0;
+    contents.append($('<div class="confirmed_per"/>').text(prefix + 'Confirmed/1M: ' + (1e6 * confirmed / tooltipCounty.population).toFixed(0) + (crate ? ` (1 in ${crate})` : '')));
+    let drate = deaths ? Math.ceil(tooltipCounty.population / deaths) : 0;
+    contents.append($('<div class="deaths_per"/>').text(prefix + 'Deaths/1M: ' + (1e6 * deaths / tooltipCounty.population).toFixed(0) + (drate ? ` (1 in ${drate})` : '')));
     if (evt) {
       tooltip.position(evt.mouse.geo);
     }
