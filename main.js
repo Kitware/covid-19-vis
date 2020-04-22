@@ -82,7 +82,8 @@ let map = geo.map({
   node: '#map',
   center: {x: -97, y: 42},
   zoom: 5,
-  max: 14
+  max: 14,
+  allowRotation: false
 });
 /* Got to the continental United States and zoom out a bit */
 map.bounds({
