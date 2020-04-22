@@ -73,6 +73,9 @@ if (query.deaths !== undefined) {
 if (query.markers !== undefined) {
   $('#markers').prop('checked', query.markers === 'true');
 }
+if (query.daily !== undefined) {
+  $('#daily').prop('checked', query.daily === 'true');
+}
 if (query.mode !== undefined) {
   $('input[name="mode"][value="' + query.mode + '"]').prop('checked', true);
 }
@@ -85,15 +88,17 @@ let map = geo.map({
   max: 14,
   allowRotation: false
 });
-/* Got to the continental United States and zoom out a bit */
+/* Go to the contiguous United States or where requested */
 map.bounds({
   left: query.left !== undefined ? +query.left : -124.85,
   top: query.top !== undefined ? +query.top : 49.39,
   right: query.right !== undefined ? +query.right : -66.88,
   bottom: query.bottom !== undefined ? +query.bottom : 24.39
 });
+/* zoom out a bit */
 map.zoom(map.zoom() - (query.zoomout !== undefined ? +query.zoomout : 0.25));
-let osmLayer = map.createLayer('osm'); // , {source: 'osm'});
+/* We could change the basemap here by adding `, {source: 'osm'}` */
+let osmLayer = map.createLayer('osm');
 osmLayer.attribution(
   osmLayer.attribution() +
   ' County boundries from <a href="https://eric.clst.org/tech/usgeojson/">US Census data</a>.' +
@@ -129,7 +134,8 @@ let promises = [];
 let dateSet = {};
 let dateList = [];
 let datePos, dateVal;
-let useSamples = false, dailyValues = false;
+let useSamples = false;
+let dailyValues = $('#daily').prop('checked');
 /* Smaller zoomStep values will cause more frequent adjustments to marker
  * opacity on zooming but reduce the number of fragments visited by the
  * fragment shader. */
@@ -318,8 +324,8 @@ promises.push(reader.read(
         counties[fips].polygons = [];
       }
       counties[fips].polygons.push(coordinates[idx]);
-      // mapouter and mapinner are in web mercator coordinates, maprange is boundingbox
-      // range is bb in lat/lon
+      // mapouter and mapinner are in web mercator coordinates, maprange is
+      // boundingbox, range is bb in lat/lon
     });
     features[0].style({fill: false, strokeWidth: 1, strokeColor: 'black', strokeOpacity: 0.1});
     countyLayer.visible(true).draw();
@@ -338,14 +344,6 @@ promises.push(fetch('https://raw.githubusercontent.com/CSSEGISandData/COVID-19/m
   return response.text();
 }).then(csv => parseCSSE(csv, 'deaths')));
 Promise.all(promises).then(() => {
-  Object.keys(counties).forEach(fips => {
-    let c = counties[fips];
-    if (!c.data || !c.population || !c.polygons) {
-      // this includes unassigned, "Out of (state)", and other things we probably want to process
-      // need to fix Puerto Rico if the data is present
-      delete counties[fips];
-    }
-  });
   counties.NYC = {
     population: 8336817, // CSSE population is odd
     fullname: counties['36061'].fullname,
@@ -355,6 +353,36 @@ Promise.all(promises).then(() => {
   };
   // remove the five boroughs from the list
   groups['New York City'].forEach(fips => delete counties[fips]);
+  // handle territories
+  [60, 66, 69, 72, 78].forEach(code => {
+    let rfips = '000' + code;
+    if (!counties[rfips] || counties[rfips].polygons) {
+      return;
+    }
+    let polygons = [];
+    Object.entries(counties).forEach(([key, value]) => {
+      if (key.length === 5 && key.substr(0, 2) === '' + code && value.polygons) {
+        polygons = polygons.concat(value.polygons);
+        delete counties[key];
+      }
+    });
+    if (polygons.length) {
+      counties[rfips].polygons = polygons;
+    }
+    countyLayer.features()[0].data().forEach(poly => {
+      if (poly.fips.length === 5 && poly.fips.substr(0, 2) === '' + code) {
+        poly.fips = rfips;
+      }
+    });
+  });
+  Object.keys(counties).forEach(fips => {
+    let c = counties[fips];
+    if (!c.data || !c.population || !c.polygons) {
+      // this includes unassigned, "Out of (state)", and other things we
+      // probably want to process
+      delete counties[fips];
+    }
+  });
   dateList = Object.keys(dateSet).sort();
   Object.keys(dateSet).forEach(k => { dateSet[k] = dateList.indexOf(k); });
   setDatePos(dateList.length - 1);
