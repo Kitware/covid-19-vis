@@ -11,8 +11,10 @@
  *  confirmed: either 'true' or 'false' to show confirmed choropleth.
  *  deaths: either 'true' or 'false' to show deaths choropleth.
  *  markers: either 'true' or 'false' to show markers.
+ *  daily: either 'true' or 'false' to select daily mode.
  *  mode: one of 'total', 'logtotal', 'percapitatotal', 'daily', 'logdaily',
  *    or 'percapitadaily' to specify initial graph mode.
+ *  fps: starting fps.
  */
 
 /* This adjusts the requested screen size for mobile devices.  It responds to
@@ -79,6 +81,9 @@ if (query.daily !== undefined) {
 if (query.mode !== undefined) {
   $('input[name="mode"][value="' + query.mode + '"]').prop('checked', true);
 }
+if (query.fps !== undefined) {
+  $('#speed').val(query.fps);
+}
 let mode = $('input[name="mode"]:checked').attr('value');
 
 let map = geo.map({
@@ -109,7 +114,10 @@ let groups = {
   'New York City': ['36005', '36047', '36061', '36081', '36085']
 };
 
-let playing = false, speed = 1, lastspeed, playTimer;
+let playing = false,
+    speed = parseFloat(document.querySelector('#speed').value),
+    lastspeed,
+    playTimer;
 
 let countyLayer = map.createLayer('feature', {features: ['polygon']});
 let dotLayer = map.createLayer('feature', {features: ['marker']})
