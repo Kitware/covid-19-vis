@@ -25,3 +25,8 @@ This repository includes a development build of `geojs <https://github.com/OpenG
 
 This uses a branch from `polybooljs <https://github.com/manubb/polybooljs>`_ to calculate the area of counties in the viewport.  Specifically, the `eps-logic` branch was built and included locally.
 
+Kitware Blog Post
+-----------------
+
+This was announced by a `Kitware Blog Post <https://blog.kitware.com/covid-19-visualization-application-includes-new-ways-to-view-data-for-cases-in-the-u-s/>`_ on April 17, 2020.
+
