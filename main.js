@@ -401,6 +401,9 @@ Promise.all(promises).then(() => {
   Object.values(counties).forEach(c => {
     Object.keys(c.data[dateVal]).forEach(k => {
       let rate = c.data[dateVal][k] / c.population;
+      if (rate > 0.5) {
+        rate = 0.5;
+      }
       if (!rates[k] || rate > rates[k]) {
         rates[k] = rate;
       }
