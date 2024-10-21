@@ -701,6 +701,7 @@ function setTime(elem, value) {
     setDatePos(newtime);
     if (isplaying) {
       datePos += dateList.length - 1;
+      lastFrameTime = 0;
       playStart();
     } else {
       updateView();
@@ -731,14 +732,14 @@ function playStart() {
     window.clearTimeout(playTimer);
   }
   let delta = 1;
-  if (playing) {
+  if (playing && lastFrameTime) {
     try {
       delta = Math.max(1, Math.floor((Date.now() - lastFrameTime) * speed / 1000));
+      if (datePos + delta > dateList.length) {
+        delta = dateList.length - datePos;
+      }
     } catch (err) {
     }
-  }
-  if (datePos + delta > dateList.length) {
-    delta = dateList.length - datePos;
   }
   setDatePos(datePos + delta);
   playing = true;
