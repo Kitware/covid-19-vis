@@ -116,6 +116,7 @@ let groups = {
 
 let playing = false,
     speed = parseFloat(document.querySelector('#speed').value),
+    lastFrameTime,
     lastspeed,
     playTimer;
 
@@ -579,8 +580,12 @@ function makeDots() {
 }
 
 function updateMarkerStyle() {
+  if (!dotLayer.visible()) {
+    return;
+  }
   let dc = {r: 0.6, g: 0, b: 0.3}, cc = {r: 0.9, g: 0.8, b: 0.4}, oc = {r: 0, g: 0, b: 1};
   let dop = 1, cop = 0.75, oop = 0.25;
+  oop = 0; //
   let dr = 9, cr = 8, or = 6;
   if (!useSamples || dailyValues) {
     dop = 0.25;
@@ -725,13 +730,24 @@ function playStart() {
   if (playTimer) {
     window.clearTimeout(playTimer);
   }
+  let delta = 1;
+  if (playing) {
+    try {
+      delta = Math.max(1, Math.floor((Date.now() - lastFrameTime) * speed / 1000));
+    } catch (err) {
+    }
+  }
+  if (datePos + delta > dateList.length) {
+    delta = dateList.length - datePos;
+  }
+  setDatePos(datePos + delta);
   playing = true;
-  setDatePos(datePos + 1);
   if (datePos !== dateList.length - 1) {
     playTimer = window.setTimeout(playStart, 1000 / speed);
   } else {
     playing = false;
   }
+  lastFrameTime = Date.now();
   updateView();
 }
 

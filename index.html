@@ -37,8 +37,8 @@
       </div>
     </div>
     <div id="timeline" class="control">
-      <div class="speed" title="Maximum frames-per-second of playback, limited to browser performance">
-        <label>fps</label> <input id="speed" value="10" onchange="if(playing)playAction('play')"/>
+      <div class="speed" title="Days per second during playback">
+        <label>days/second</label> <input id="speed" value="30" onchange="if(playing)playAction('play')"/>
       </div>
       <div class="playback-controls">
         <button onclick="playAction('play')" title="Animate daily data on the map">
@@ -57,13 +57,13 @@
       </div>
       <div class="marker-controls">
         <label class="marker-checkbox" for="markers" title="Show one dot per confirmed case or reported death">
-          <input id="markers" type="checkbox" checked="true" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Dots</span>
+          <input id="markers" type="checkbox" onchange="dotLayer.visible($('#markers')[0].checked);updateMarkerStyle()"></input><span>Dots</span>
         </label>
         <label class="marker-checkbox" for="county_confirmed" title="Show a heatmap of confirmed cases per million by county">
-          <input id="county_confirmed" type="checkbox" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
+          <input id="county_confirmed" type="checkbox" checked="true" onchange="countyLayer.features()[2].visible($('#county_confirmed')[0].checked).draw()"></input><span>Heatmap (confirmed cases)</span>
         </label>
         <label class="marker-checkbox" for="county_deaths" title="Show a heatmap of confirmed cases per million by county">
-          <input id="county_deaths" type="checkbox" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
+          <input id="county_deaths" type="checkbox" checked="true" onchange="countyLayer.features()[3].visible($('#county_deaths')[0].checked).draw()"></input><span>Heatmap (reported deaths)</span>
         </label>
       </div>
       <div class="marker-controls">
@@ -71,10 +71,8 @@
           <input id="daily" type="checkbox" onchange="updateView()"></input><span>Daily</span>
         </label>
       </div>
-      <!--
-      <input id="samples" type="checkbox" onchange="makeDots()"></input><label for="samples">Samples</label>
-      <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="2500" title="2500" type="range" min="500" max="10000" step="500" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
-      -->
+      <input id="samples" type="checkbox" onchange="makeDots()" checked="true"></input><label for="samples">Samples</label>
+      <label for="sampling" title="There is one dot per this many people">Sampling</label> <input id="sampling" value="1000" title="1000" type="range" min="10" max="2500" step="10" onchange="makeDots();$('#sampling').attr('title', $('#sampling').val())"/>
     </div>
   </div>
   <div id="graphparent" class="control">
@@ -229,7 +227,7 @@
   </div>
   <div class="loading">
     <div class="loadingtext">
-      <span>Data is loading.<br/>Please wait (usually 30 seconds or less)</span>
+      <span>Data is loading.<br/>Please wait (usually 90 seconds or less)</span>
     </div>
   </div>
   <script type="text/javascript" src="main.js"></script>
